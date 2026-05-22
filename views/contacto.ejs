@@ -1,0 +1,68 @@
+<%- include('partials/head') %>
+
+  <%- include('partials/header') %>
+
+  <link rel="stylesheet" href="/resources/css/contacto.css">
+  
+    <div class="section-container">
+      <section class="section" id="contacto">
+        <div class="container-form">
+          <div class="info-form">
+            <h2>CONTACTO</h2>
+            <p>Puedes enviarnos un mensaje usando el formulario o contactarnos directamente.</p>
+            <a href="#"><i class="fa-sharp fa-solid fa-phone"></i> + 54 9 2616857811</a>
+            <a href="#"><i class="fa-sharp fa-solid fa-envelope"></i> DG@gmail.com</a>
+            <a href="#"><i class="fa-sharp fa-solid fa-map-location"></i> San Martin 333, Godoy Cruz, Mendoza, Argentina</a>
+          </div>
+
+          <form action="/contacto" method="POST" autocomplete="off">
+            <% if (errors.length > 0) { %>
+              <div class="alert alert-danger">
+                <ul>
+                  <% errors.forEach(function(error){ %>
+                    <li><%= error.msg %></li>
+                  <% }) %>
+                </ul>
+              </div>
+            <% } %>
+
+            <% if (typeof success !== 'undefined') { %>
+              <div class="alert alert-success">
+                <%= success %>
+              </div>
+            <% } %>
+
+            <input
+              type="text"
+              name="nombre"
+              placeholder="Ingresa tu nombre"
+              class="campo form-control mb-2"
+              value="<%= old.nombre ? old.nombre : '' %>"
+            />
+            <input
+              type="email"
+              name="email"
+              placeholder="Correo Electrónico"
+              class="campo form-control mb-2"
+              value="<%= old.email ? old.email : '' %>"
+            />
+            <textarea
+              name="mensaje"
+              placeholder="Mensaje"
+              class="campo form-control mb-2"
+            ><%= old.mensaje ? old.mensaje : '' %></textarea>
+            <input
+              type="submit"
+              name="enviar"
+              value="Enviar mensaje"
+              class="btn btn-primary"
+            />
+          </form>
+        </div>
+      </section>
+    </div>
+
+    <script src="/assets/Bootstrap/bootstrap-5.3.0-alpha1-dist/js/bootstrap.bundle.min.js"></script>
+
+      <%- include('partials/footer') %>
+

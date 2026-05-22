@@ -1,0 +1,123 @@
+@font-face {
+    font-family: "coco";
+    src: url(./resourses/img/coco_gothic/CocoGothic-Bold_trial.ttf);
+}
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body{
+    height: 100vh;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    align-items: center;
+    perspective: 1000px;
+    transform-style: preserve-3d;
+    position: relative;
+    background-color: #111;
+    font-family: "coco";
+}
+
+.container {
+    width: 700px;
+    height: 350px;
+    border-radius: 20px;
+    position: relative;
+    transition: 1.5s ease-in-out;
+    transform-style: preserve-3d;
+}
+
+.side{
+    position: absolute;
+    text-align: center;
+    width: 100%;
+    height: 100%;
+    padding: 60px 60px;
+    color: white;
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+    border-radius: 20px;
+}
+
+.content{
+    transform: translateZ(70px);
+    scale: (0.8);
+    line-height: 1.5em;
+}
+
+.content h1 {
+    position: relative;
+    font-size: 20px;
+    font-family: "coco";
+
+}
+
+.content h1:before{
+    content: "";
+    position: absolute;
+    bottom: -20px;
+    height: 3px;
+    background-color: white;
+    width: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+
+}
+
+.front {
+    z-index: 2;
+    background-image: url(./resourses/img/Black-dog-and-black-background-look_5120x2880.jpg);
+    background-size: 200vh;
+    color: white;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.back {
+    background-color: #333;
+    transform: rotateY(180deg);
+    z-index: 0;
+    background-image: 
+    url(./resourses/img/wallpaperbetter.jpg);
+    background-size: cover;
+
+}
+
+.container:hover{
+    transform: rotateY(180deg);
+}
+
+form label, form input{
+    display: block;
+}
+
+form input, form textarea{
+    background: transparent;
+    border: 0;
+    border-bottom: 2px solid white;
+    width: 100%;
+    color: white;
+    outline: none;
+}
+
+form label{
+    margin: 0;
+}
+
+form input[type="submit"]{
+    display: block;
+    width: auto;
+    margin: 10px auto;
+    padding: 5px 5px;
+    border-radius: 3px solid white;
+    border-radius: 4px;
+    color: white;
+    cursor: pointer;
+}
