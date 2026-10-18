@@ -1,242 +1,336 @@
-<%- include('partials/head') %>
-<%- include('partials/header') %>
+<%
+  const img = (name) => "/resources/img/" + encodeURIComponent(name);
+  const whatsapp = "https://wa.me/5492616857811";
+  const telegram = "https://t.me/+5492616857811";
+  const email = "dogdreamshotel@outlook.com";
+  const mapa = "https://www.google.com/maps/search/?api=1&query=Zizzias%20699%20Godoy%20Cruz%20Mendoza";
 
-<main id="inicio">
-  <section class="showcase-hero">
-    <div class="container hero-board">
-      <div class="hero-left">
-        <div class="phone-mockup" aria-label="Vista previa de turnos DogDreams">
-          <div class="phone-top"></div>
-          <div class="app-screen">
-            <div class="app-header">
-              <span>DogDreams</span>
-              <i class="fa-solid fa-bell"></i>
+  const servicios = [
+    {
+      id: "hotel",
+      nombre: "Hotel",
+      frase: "hotel",
+      detalle: "Noches y fines de semana",
+      texto: "Estadías cuando necesitás viajar. Duermen adentro de la casa, en camas y mantas, nunca en un canil.",
+      foto: "adistramiento.jpg",
+      alt: "Bulldog francés negro mirando hacia arriba",
+    },
+    {
+      id: "guarderia",
+      nombre: "Guardería",
+      frase: "guardería",
+      detalle: "Por día",
+      texto: "Jornadas de juego en el patio, pileta en verano, siesta a la sombra y alguien mirando todo el tiempo.",
+      foto: "guarderia.jpg",
+      alt: "Perro tricolor recostado sobre un fondo amarillo",
+    },
+    {
+      id: "peluqueria",
+      nombre: "Peluquería y spa",
+      frase: "un turno de peluquería y spa",
+      detalle: "Baño, corte e higiene",
+      texto: "Baño, corte, higiene y tratamientos pensados para cada raza, tamaño y tipo de pelo.",
+      foto: "peluqueria.jpg",
+      alt: "Perro envuelto en una toalla azul después del baño",
+    },
+    {
+      id: "veterinaria",
+      nombre: "Veterinaria",
+      frase: "un turno de veterinaria",
+      detalle: "Consultas y controles",
+      texto: "Consultas, orientación preventiva y seguimiento del bienestar diario de tu perro.",
+      foto: "veterinaria-sin-texto.jpg",
+      pos: "100% 50%",
+      alt: "Cachorro de weimaraner mirando a la cámara",
+    },
+    {
+      id: "colegio",
+      nombre: "Colegio",
+      frase: "un lugar en el colegio",
+      detalle: "Cachorros y adultos",
+      texto: "Socialización, aprendizaje y acompañamiento para perros jóvenes y adultos.",
+      foto: "colegiales.jpg",
+      alt: "Bulldog francés sentado sobre un fondo rosa",
+    },
+  ];
+%>
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="DogDreams: hotel, guardería, peluquería, veterinaria y colegio canino sin jaulas en Zizzias 699, Godoy Cruz, Mendoza."
+    />
+    <title>DogDreams | Hotel y spa canino en Godoy Cruz</title>
+    <script>document.documentElement.classList.add("js");</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700&family=Barlow:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/resources/css/inicio.css" />
+  </head>
+  <body>
+    <main id="inicio">
+      <!-- Hero: tarjeta amarilla sobre un huésped dormido -->
+      <section class="hero" aria-label="DogDreams">
+        <div class="hero__stage">
+          <div class="hero__photo">
+            <img
+              src="<%= img('Black-dog-and-black-background-look_5120x2880.jpg') %>"
+              alt="Perro negro de perfil sobre fondo negro"
+              width="5120"
+              height="2880"
+            />
+          </div>
+
+          <div class="hero__card" data-hero-card>
+            <h1 class="hero__title" data-rise style="--i: 0">
+              <span>Dog</span>
+              <span>Dreams</span>
+            </h1>
+
+            <div class="hero__body">
+              <p class="hero__facts" data-rise style="--i: 1">
+                Hotel, guardería y spa canino<br />
+                Sin jaulas, en una casa con patio<br />
+                Zizzias 699, Godoy Cruz
+              </p>
+              <p class="hero__line" data-rise style="--i: 2">
+                Todo lo que tu perro sueña, mientras vos no estás.
+              </p>
             </div>
-            <div class="pet-profile">
-              <img src="/resources/img/WhatsApp%20Image%202023-03-23%20at%2020.38.48.jpeg" alt="Mascota en DogDreams" />
-              <div>
-                <strong>Mora</strong>
-                <small>Próximo turno: hoy 16:30</small>
-              </div>
+
+            <div class="hero__foot" data-rise style="--i: 3">
+              <p class="small">Godoy Cruz, Mendoza</p>
+              <a class="button button--dark" href="<%= whatsapp %>" target="_blank" rel="noopener">
+                Reservar por WhatsApp
+              </a>
+              <nav class="hero__nav" aria-label="Secciones">
+                <a class="link" href="#servicios">Servicios</a>
+                <a class="link" href="#reservar">Reservar</a>
+                <a class="link" href="#contacto">Contacto</a>
+              </nav>
             </div>
-            <div class="quick-grid">
-              <div>
-                <i class="fa-solid fa-stethoscope"></i>
-                <span>Veterinaria</span>
-              </div>
-              <div>
-                <i class="fa-solid fa-scissors"></i>
-                <span>Peluquería</span>
-              </div>
-              <div>
-                <i class="fa-solid fa-house-chimney"></i>
-                <span>Hotel</span>
-              </div>
-              <div>
-                <i class="fa-solid fa-graduation-cap"></i>
-                <span>Colegio</span>
-              </div>
-            </div>
-            <div class="schedule-card">
-              <small>Plan de cuidado</small>
-              <strong>Baño, control y juego supervisado</strong>
-              <span>Equipo asignado · 3 servicios</span>
-            </div>
-            <button type="button">Reservar visita</button>
           </div>
         </div>
+      </section>
 
-        <a class="primary-cta" href="https://wa.me/5492616857811" target="_blank" rel="noopener">
-          <i class="fa-brands fa-whatsapp"></i>
-          Reservar por WhatsApp
-        </a>
-      </div>
-
-      <div class="hero-right">
-        <p class="eyebrow">Veterinaria, peluquería y hotel</p>
-        <h1>Mascotas sanas, <span>familias felices.</span></h1>
-        <p class="hero-copy">
-          Una experiencia de cuidado integral para mascotas: atención veterinaria, spa,
-          guardería, colegio y hotel en un mismo lugar, con trato humano y seguimiento cercano.
-        </p>
-
-        <div class="hero-collage">
-          <img class="collage-main" src="/resources/img/PicsArt_05-19-10.03.50.jpg" alt="Perro cliente de DogDreams" />
-          <img class="collage-small top" src="/resources/img/peluqueria.jpg" alt="Peluquería canina DogDreams" />
-          <img class="collage-small bottom" src="/resources/img/guarderia.jpg" alt="Guardería para mascotas" />
+      <!-- Intro: la frase queda fija, los huéspedes dormidos pasan -->
+      <section class="intro" aria-label="Sin jaulas">
+        <div class="intro__pin">
+          <p class="intro__statement" data-reveal>
+            Acá no hay caniles. Duermen en camas, mantas y almohadones, como en casa.
+          </p>
+          <p class="intro__note muted" data-reveal style="--d: 1">
+            Cada huésped tiene su lugar adentro de la casa y su rutina de siempre: horarios de comida,
+            paseos y siesta.
+          </p>
         </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="benefits-section" id="experiencia">
-    <div class="container experience-panel">
-      <div class="experience-heading">
-        <p class="eyebrow">Experiencia</p>
-        <h2>Cuidado premium con calidez real.</h2>
-        <span>DogDreams reúne bienestar, estética, descanso y acompañamiento en una experiencia cuidada de principio a fin.</span>
-      </div>
-      <div class="benefit-list about-points">
-        <article>
-          <span>01</span>
-          <h3>Cuidado sin jaulas</h3>
-          <p>Priorizamos un ambiente cómodo, supervisado y acompañado.</p>
-        </article>
-        <article>
-          <span>02</span>
-          <h3>Bienestar integral</h3>
-          <p>Unimos salud, higiene, descanso y juego en un mismo lugar.</p>
-        </article>
-        <article>
-          <span>03</span>
-          <h3>Trato cercano</h3>
-          <p>Nos adaptamos a la edad, tamaño, carácter y rutina de cada mascota.</p>
-        </article>
-        <article>
-          <span>04</span>
-          <h3>Servicios completos</h3>
-          <p>Veterinaria, peluquería, hotel, guardería y colegio canino.</p>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <section class="services-section" id="servicios">
-    <div class="container">
-      <div class="section-heading">
-        <p class="eyebrow">Servicios</p>
-        <h2>Un sistema modular para todo el bienestar de tu mascota.</h2>
-      </div>
-
-      <div class="service-grid">
-        <article class="service-card">
-          <img class="service-img-vet" src="/resources/img/veterinaria-sin-texto.jpg" alt="Servicio veterinario" />
-          <div>
-            <i class="fa-solid fa-stethoscope"></i>
-            <h3>Veterinaria</h3>
-            <p>Consultas, orientación preventiva y seguimiento del bienestar diario.</p>
-          </div>
-        </article>
-        <article class="service-card">
-          <img class="service-img-grooming" src="/resources/img/peluqueria.jpg" alt="Peluquería y spa canino" />
-          <div>
-            <i class="fa-solid fa-scissors"></i>
-            <h3>Peluquería & Spa</h3>
-            <p>Baño, corte, higiene y tratamientos para diferentes razas y tamaños.</p>
-          </div>
-        </article>
-        <article class="service-card">
-          <img class="service-img-hotel" src="/resources/img/hospedaje.jpg" alt="Hotel para perros" />
-          <div>
-            <i class="fa-solid fa-house-chimney"></i>
-            <h3>Hotel</h3>
-            <p>Estadías cómodas, seguras y acompañadas cuando necesitás viajar.</p>
-          </div>
-        </article>
-        <article class="service-card">
-          <img class="service-img-daycare" src="/resources/img/guarderia.jpg" alt="Guardería para perros" />
-          <div>
-            <i class="fa-solid fa-sun"></i>
-            <h3>Guardería</h3>
-            <p>Jornadas con juego, descanso y supervisión para gastar energía sano.</p>
-          </div>
-        </article>
-        <article class="service-card service-wide">
-          <img class="service-img-school" src="/resources/img/colegiales.jpg" alt="Colegio canino" />
-          <div>
-            <i class="fa-solid fa-graduation-cap"></i>
-            <h3>Colegio</h3>
-            <p>Socialización, aprendizaje y acompañamiento para perros jóvenes y adultos.</p>
-          </div>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <section class="pets-collage-section" id="clientes">
-    <div class="container collage-layout">
-      <div class="section-heading">
-        <p class="eyebrow">Clientes felices</p>
-        <h2>Mascotas reales, cuidado real.</h2>
-        <p>
-          Las fotos son parte de la identidad de DogDreams: cercanía, expresión y confianza.
-        </p>
-      </div>
-
-      <div class="client-slider" aria-label="Fotos de clientes felices">
-        <div class="client-track">
-          <img src="/resources/img/IMG-20200426-WA0013.jpg" alt="Cliente canino DogDreams" />
-          <img src="/resources/img/IMG-20200426-WA0015.jpg" alt="Mascota descansando" />
-          <img src="/resources/img/IMG-20200619-WA0033.jpg" alt="Perro en DogDreams" />
-          <img src="/resources/img/WhatsApp%20Image%202023-03-23%20at%2020.39.34.jpeg" alt="Perro cliente" />
-          <img src="/resources/img/WhatsApp%20Image%202023-01-17%20at%2014.18.22.jpeg" alt="Mascota cliente" />
-          <img src="/resources/img/WhatsApp%20Image%202023-03-23%20at%2020.38.19.jpeg" alt="Perro cuidado por DogDreams" />
-          <img src="/resources/img/IMG-20200426-WA0013.jpg" alt="" aria-hidden="true" />
-          <img src="/resources/img/IMG-20200426-WA0015.jpg" alt="" aria-hidden="true" />
-          <img src="/resources/img/IMG-20200619-WA0033.jpg" alt="" aria-hidden="true" />
-          <img src="/resources/img/WhatsApp%20Image%202023-03-23%20at%2020.39.34.jpeg" alt="" aria-hidden="true" />
-          <img src="/resources/img/WhatsApp%20Image%202023-01-17%20at%2014.18.22.jpeg" alt="" aria-hidden="true" />
-          <img src="/resources/img/WhatsApp%20Image%202023-03-23%20at%2020.38.19.jpeg" alt="" aria-hidden="true" />
+        <div class="intro__photos">
+          <figure class="intro__fig intro__fig--a shutter" data-reveal>
+            <img
+              src="<%= img('WhatsApp Image 2023-01-17 at 14.18.21 (1).jpeg') %>"
+              alt="Un salchicha acostado en su cama"
+              width="1200"
+              height="1600"
+              loading="lazy"
+            />
+          </figure>
+          <figure class="intro__fig intro__fig--b shutter" data-reveal>
+            <img
+              src="<%= img('WhatsApp Image 2023-01-17 at 14.18.22 (1).jpeg') %>"
+              alt="Un perro descansando sobre una manta de colores"
+              width="1200"
+              height="1600"
+              loading="lazy"
+            />
+          </figure>
+          <figure class="intro__fig intro__fig--c shutter" data-reveal>
+            <img
+              src="<%= img('WhatsApp Image 2023-03-23 at 20.36.58.jpeg') %>"
+              alt="Un pomerania sobre una manta a rayas"
+              width="1200"
+              height="1600"
+              loading="lazy"
+            />
+          </figure>
         </div>
-      </div>
-    </div>
-  </section>
+      </section>
 
-  <section class="contact-section" id="contacto">
-    <div class="container contact-card">
-      <div class="contact-copy">
-        <p class="eyebrow">Contacto</p>
-        <h2>Coordinemos el próximo cuidado de tu mascota.</h2>
-        <p>
-          Escribinos por WhatsApp y contanos qué servicio necesitás, edad, tamaño y fecha ideal.
+      <!-- Servicios: foto fija, lista activa -->
+      <section class="services" id="servicios" aria-labelledby="servicios-titulo">
+        <div class="services__frame" aria-hidden="true">
+          <% servicios.forEach((s, i) => { %>
+            <img
+              class="<%= i === 0 ? 'is-on' : '' %>"
+              data-frame="<%= s.id %>"
+              style="object-position: <%= s.pos || '50% 50%' %>"
+              src="<%= img(s.foto) %>"
+              alt=""
+              loading="lazy"
+            />
+          <% }) %>
+        </div>
+
+        <div class="services__list">
+          <h2 class="head" id="servicios-titulo" data-reveal>Lo que hacemos</h2>
+          <ul class="services__rows">
+            <% servicios.forEach((s, i) => { %>
+              <li class="row<%= i === 0 ? ' is-active' : '' %>" data-row="<%= s.id %>" data-reveal style="--d: <%= i %>">
+                <button class="row__head" type="button" aria-expanded="<%= i === 0 %>" aria-controls="desc-<%= s.id %>">
+                  <span class="row__name"><%= s.nombre %></span>
+                  <span class="row__detail"><%= s.detalle %></span>
+                </button>
+                <div class="row__panel" id="desc-<%= s.id %>">
+                  <div>
+                    <div class="row__inline"><img style="object-position: <%= s.pos || '50% 50%' %>" src="<%= img(s.foto) %>" alt="<%= s.alt %>" loading="lazy" /></div>
+                    <p><%= s.texto %></p>
+                  </div>
+                </div>
+              </li>
+            <% }) %>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Galería: tres fotos a pantalla completa, una sobre otra -->
+      <section class="gallery" aria-label="La casa">
+        <p class="gallery__note muted" data-reveal>
+          Huéspedes de DogDreams en el patio y adentro de la casa, en Godoy Cruz.
         </p>
-        <a href="https://wa.me/5492616857811" target="_blank" rel="noopener">
-          <i class="fa-brands fa-whatsapp"></i> +54 9 261 685 7811
-        </a>
-        <a href="mailto:dogdreamshotel@outlook.com">
-          <i class="fa-solid fa-envelope"></i> dogdreamshotel@outlook.com
-        </a>
-        <a
-          href="https://www.google.com/maps/search/?api=1&query=Zizzias%20699%20Godoy%20Cruz%20Mendoza"
-          target="_blank"
-          rel="noopener"
-        >
-          <i class="fa-solid fa-location-dot"></i> Zizzias 699, Godoy Cruz, Mendoza
-        </a>
-      </div>
+        <figure class="gallery__panel">
+          <img src="<%= img('WhatsApp Image 2023-01-17 at 14.18.21.jpeg') %>" alt="Un ovejero alemán echado sobre baldosas rojas" width="1200" height="1600" loading="lazy" />
+          <img src="<%= img('WhatsApp Image 2023-01-17 at 14.18.23 (1).jpeg') %>" alt="Un perro negro sentado en el patio" width="1200" height="1600" loading="lazy" />
+          <figcaption>Siesta sobre las baldosas frescas.</figcaption>
+        </figure>
+        <figure class="gallery__panel">
+          <img src="<%= img('WhatsApp Image 2023-01-17 at 14.18.25.jpeg') %>" alt="Un salchicha negro mirando hacia arriba en el patio" width="1200" height="1600" loading="lazy" />
+          <img src="<%= img('WhatsApp Image 2023-03-23 at 20.38.19.jpeg') %>" alt="Un ovejero alemán mirando a la cámara" width="1200" height="1600" loading="lazy" />
+          <figcaption>Recorrida de la tarde por el patio.</figcaption>
+        </figure>
+        <figure class="gallery__panel">
+          <img src="<%= img('WhatsApp Image 2023-01-17 at 14.18.25 (1).jpeg') %>" alt="Un perro dorado echado al sol sobre la tierra" width="1200" height="1600" loading="lazy" />
+          <img src="<%= img('WhatsApp Image 2023-03-23 at 20.39.34.jpeg') %>" alt="Un pug sentado en una silla" width="1200" height="1600" loading="lazy" />
+          <figcaption>Después de jugar, un rato al sol.</figcaption>
+        </figure>
+      </section>
 
-      <form class="contact-form" id="contactForm" autocomplete="off">
-        <input type="text" id="nombre" name="nombre" placeholder="Ingresa tu nombre" required />
+      <!-- Cómo reservar: un verbo por pantalla -->
+      <section class="steps" aria-labelledby="pasos-titulo">
+        <h2 class="sr-only" id="pasos-titulo">Cómo reservar</h2>
+        <ol class="steps__list">
+          <li class="step">
+            <div class="step__media"><img src="<%= img('WhatsApp Image 2023-03-23 at 20.38.48.jpeg') %>" alt="Un labrador blanco con un juguete de soga" loading="lazy" /></div>
+            <div class="step__pin"><h3 class="step__verb">Escribí</h3></div>
+            <p class="step__text">Contanos por WhatsApp qué servicio buscás, las fechas y cómo es tu perro.</p>
+          </li>
+          <li class="step">
+            <div class="step__media"><img src="<%= img('WhatsApp Image 2023-01-17 at 14.18.23 (2).jpeg') %>" alt="Un perro blanco frente al cartel de DogDreams" loading="lazy" /></div>
+            <div class="step__pin"><h3 class="step__verb">Traelo</h3></div>
+            <p class="step__text">Lo recibimos en Zizzias 699, con su manta o su juguete si los tiene.</p>
+          </li>
+          <li class="step">
+            <div class="step__media"><img src="<%= img('WhatsApp Image 2023-03-23 at 20.39.11.jpeg') %>" alt="Un perro pequeño parado en el patio" loading="lazy" /></div>
+            <div class="step__pin"><h3 class="step__verb">Buscalo</h3></div>
+            <p class="step__text">Vuelve a casa limpio, cansado de jugar y bien dormido.</p>
+          </li>
+        </ol>
+      </section>
 
-        <input type="email" id="email" name="email" placeholder="tu@email.com" required />
+      <!-- Lo vivo: el mensaje de reserva se escribe solo -->
+      <section class="compose" id="reservar" aria-labelledby="reservar-titulo">
+        <div class="compose__controls">
+          <h2 class="head" id="reservar-titulo" data-reveal>Tu mensaje, ya escrito</h2>
+          <p class="compose__intro" data-reveal style="--d: 1">
+            Elegí el servicio y el tamaño, poné el nombre y las fechas. Lo mandás por WhatsApp con un toque.
+          </p>
 
-        <textarea id="mensaje" name="mensaje" rows="5" placeholder="Contanos qué necesita tu mascota" required></textarea>
+          <form class="compose__form" data-compose data-reveal style="--d: 2" action="<%= whatsapp %>" method="get" target="_blank">
+            <fieldset>
+              <legend>Servicio</legend>
+              <div class="choices">
+                <% servicios.forEach((s, i) => { %>
+                  <label class="choice">
+                    <input type="radio" name="servicio" value="<%= s.frase %>" <%= i === 0 ? 'checked' : '' %> />
+                    <span><%= s.nombre %></span>
+                  </label>
+                <% }) %>
+              </div>
+            </fieldset>
 
-        <button type="submit">Enviar mensaje</button>
-      </form>
-    </div>
-  </section>
-</main>
+            <fieldset>
+              <legend>Tamaño</legend>
+              <div class="choices">
+                <% ["chico", "mediano", "grande"].forEach((t, i) => { %>
+                  <label class="choice">
+                    <input type="radio" name="tamano" value="<%= t %>" <%= i === 1 ? 'checked' : '' %> />
+                    <span><%= t.charAt(0).toUpperCase() + t.slice(1) %></span>
+                  </label>
+                <% }) %>
+              </div>
+            </fieldset>
 
-<script>
-  const contactForm = document.getElementById("contactForm");
-  const whatsappPhone = "5492616857811";
+            <div class="fields">
+              <label class="field-label">
+                Nombre de tu perro
+                <input class="field" type="text" name="nombre" autocomplete="off" placeholder="Mora" />
+              </label>
+              <label class="field-label">
+                Desde
+                <input class="field" type="date" name="desde" />
+              </label>
+              <label class="field-label">
+                Hasta
+                <input class="field" type="date" name="hasta" />
+              </label>
+            </div>
+          </form>
+        </div>
 
-  contactForm.addEventListener("submit", function (event) {
-    event.preventDefault();
+        <div class="compose__preview" data-reveal style="--d: 1">
+          <p class="compose__message" data-message aria-live="polite">
+            Hola DogDreams, quiero reservar hotel para mi perro, de tamaño mediano. ¿Tienen lugar?
+          </p>
+          <a class="button" data-send href="<%= whatsapp %>" target="_blank" rel="noopener">Enviar por WhatsApp</a>
+        </div>
+      </section>
 
-    if (!contactForm.checkValidity()) {
-      contactForm.reportValidity();
-      return;
-    }
+      <!-- Contacto: el correo como tipografía -->
+      <section class="contact" id="contacto" aria-label="Contacto">
+        <p class="contact__lead" data-reveal>
+          Escribinos para reservar, preguntar un precio o venir a conocer la casa.
+        </p>
+        <p class="contact__mail" data-reveal style="--d: 1">
+          <a href="mailto:<%= email %>?subject=Consulta%20para%20DogDreams">dogdreamshotel@<wbr /><span>outlook.com</span></a>
+        </p>
+        <div class="contact__foot" data-reveal style="--d: 2">
+          <p>
+            <a class="link-plain" href="<%= whatsapp %>" target="_blank" rel="noopener">+54 9 261 685 7811</a><br />
+            Zizzias 699, Godoy Cruz, Mendoza
+          </p>
+          <p class="contact__links">
+            <a class="link-plain" href="<%= whatsapp %>" target="_blank" rel="noopener">WhatsApp</a>
+            <a class="link-plain" href="<%= telegram %>" target="_blank" rel="noopener">Telegram</a>
+            <a class="link-plain" href="<%= mapa %>" target="_blank" rel="noopener">Cómo llegar</a>
+          </p>
+        </div>
+      </section>
+    </main>
 
-    const nombre = document.getElementById("nombre").value.trim();
-    const email = document.getElementById("email").value.trim();
-    const mensaje = document.getElementById("mensaje").value.trim();
-    const texto = `Hola DogDreams, soy ${nombre}. Mi email es ${email}. ${mensaje}`;
+    <footer class="footer">
+      <p class="muted">Hotel y spa canino en Godoy Cruz</p>
+      <nav class="footer__links" aria-label="Pie de página">
+        <a class="link" href="#servicios">Servicios</a>
+        <a class="link" href="#reservar">Reservar</a>
+        <a class="link" href="#contacto">Contacto</a>
+      </nav>
+      <p class="muted footer__year">© <%= new Date().getFullYear() %> DogDreams</p>
+    </footer>
 
-    window.open(`https://wa.me/${whatsappPhone}?text=${encodeURIComponent(texto)}`, "_blank");
-  });
-</script>
-
-<%- include('partials/footer') %>
+    <script src="/resources/js/inicio.js" defer></script>
+  </body>
+</html>
