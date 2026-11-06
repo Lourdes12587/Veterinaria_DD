@@ -1,9 +1,8 @@
 <%
   const img = (name) => "/resources/img/" + encodeURIComponent(name);
-  const whatsapp = "https://wa.me/5492616857811";
+  const whatsapp = "https://wa.me/";
   const telegram = "https://t.me/+5492616857811";
   const email = "dogdreamshotel@outlook.com";
-  const mapa = "https://www.google.com/maps/search/?api=1&query=Zizzias%20699%20Godoy%20Cruz%20Mendoza";
 
   const servicios = [
     {
@@ -61,9 +60,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="DogDreams: hotel, guardería, peluquería, veterinaria y colegio canino sin jaulas en Zizzias 699, Godoy Cruz, Mendoza."
+      content="Dog DD: hotel, guardería, peluquería, veterinaria y colegio canino sin jaulas en Godoy Cruz, Mendoza."
     />
-    <title>DogDreams | Hotel y spa canino en Godoy Cruz</title>
+    <title>Dog DD | Hotel y spa canino en Godoy Cruz</title>
     <script>document.documentElement.classList.add("js");</script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -76,7 +75,7 @@
   <body>
     <main id="inicio">
       <!-- Hero: tarjeta amarilla sobre un huésped dormido -->
-      <section class="hero" aria-label="DogDreams">
+      <section class="hero" aria-label="Dog DD">
         <div class="hero__stage">
           <div class="hero__photo">
             <img
@@ -96,8 +95,7 @@
             <div class="hero__body">
               <p class="hero__facts" data-rise style="--i: 1">
                 Hotel, guardería y spa canino<br />
-                Sin jaulas, en una casa con patio<br />
-                Zizzias 699, Godoy Cruz
+                Sin jaulas, en una casa con patio
               </p>
               <p class="hero__line" data-rise style="--i: 2">
                 Todo lo que tu perro sueña, mientras vos no estás.
@@ -200,7 +198,7 @@
       <!-- Galería: tres fotos a pantalla completa, una sobre otra -->
       <section class="gallery" aria-label="La casa">
         <p class="gallery__note muted" data-reveal>
-          Huéspedes de DogDreams en el patio y adentro de la casa, en Godoy Cruz.
+          Huéspedes de Dog DD en el patio y adentro de la casa, en Godoy Cruz.
         </p>
         <figure class="gallery__panel">
           <img src="<%= img('WhatsApp Image 2023-01-17 at 14.18.21.jpeg') %>" alt="Un ovejero alemán echado sobre baldosas rojas" width="1200" height="1600" loading="lazy" />
@@ -229,9 +227,9 @@
             <p class="step__text">Contanos por WhatsApp qué servicio buscás, las fechas y cómo es tu perro.</p>
           </li>
           <li class="step">
-            <div class="step__media"><img src="<%= img('WhatsApp Image 2023-01-17 at 14.18.23 (2).jpeg') %>" alt="Un perro blanco frente al cartel de DogDreams" loading="lazy" /></div>
+            <div class="step__media"><img src="<%= img('WhatsApp Image 2023-01-17 at 14.18.23 (2).jpeg') %>" alt="Un perro blanco frente al cartel de Dog DD" loading="lazy" /></div>
             <div class="step__pin"><h3 class="step__verb">Traelo</h3></div>
-            <p class="step__text">Lo recibimos en Zizzias 699, con su manta o su juguete si los tiene.</p>
+            <p class="step__text">Lo recibimos en casa, con su manta o su juguete si los tiene.</p>
           </li>
           <li class="step">
             <div class="step__media"><img src="<%= img('WhatsApp Image 2023-03-23 at 20.39.11.jpeg') %>" alt="Un perro pequeño parado en el patio" loading="lazy" /></div>
@@ -293,7 +291,7 @@
 
         <div class="compose__preview" data-reveal style="--d: 1">
           <p class="compose__message" data-message aria-live="polite">
-            Hola DogDreams, quiero reservar hotel para mi perro, de tamaño mediano. ¿Tienen lugar?
+            Hola Dog DD, quiero reservar hotel para mi perro, de tamaño mediano. ¿Tienen lugar?
           </p>
           <a class="button" data-send href="<%= whatsapp %>" target="_blank" rel="noopener">Enviar por WhatsApp</a>
         </div>
@@ -305,17 +303,12 @@
           Escribinos para reservar, preguntar un precio o venir a conocer la casa.
         </p>
         <p class="contact__mail" data-reveal style="--d: 1">
-          <a href="mailto:<%= email %>?subject=Consulta%20para%20DogDreams">dogdreamshotel@<wbr /><span>outlook.com</span></a>
+          <a href="mailto:<%= email %>?subject=Consulta%20para%20Dog%20DD">dogdreamshotel@<wbr /><span>outlook.com</span></a>
         </p>
         <div class="contact__foot" data-reveal style="--d: 2">
-          <p>
-            <a class="link-plain" href="<%= whatsapp %>" target="_blank" rel="noopener">+54 9 261 685 7811</a><br />
-            Zizzias 699, Godoy Cruz, Mendoza
-          </p>
           <p class="contact__links">
             <a class="link-plain" href="<%= whatsapp %>" target="_blank" rel="noopener">WhatsApp</a>
             <a class="link-plain" href="<%= telegram %>" target="_blank" rel="noopener">Telegram</a>
-            <a class="link-plain" href="<%= mapa %>" target="_blank" rel="noopener">Cómo llegar</a>
           </p>
         </div>
       </section>
@@ -328,7 +321,7 @@
         <a class="link" href="#reservar">Reservar</a>
         <a class="link" href="#contacto">Contacto</a>
       </nav>
-      <p class="muted footer__year">© <%= new Date().getFullYear() %> DogDreams</p>
+      <p class="muted footer__year">© <%= new Date().getFullYear() %> Dog DD</p>
     </footer>
 
     <script src="/resources/js/inicio.js" defer></script>

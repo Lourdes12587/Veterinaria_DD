@@ -1,4 +1,4 @@
-// DogDreams — inicio
+// Dog DD — inicio
 const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 // Aparición única cuando un bloque entra en pantalla. Nunca deja contenido oculto.
@@ -87,7 +87,7 @@ const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const out = document.querySelector("[data-message]");
   const send = document.querySelector("[data-send]");
   if (!form || !out || !send) return;
-  const phone = "5492616857811";
+  const phone = "";
   const fecha = (v) => {
     if (!v) return "";
     const [, m, d] = v.split("-");
@@ -104,7 +104,7 @@ const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let cuando = "";
     if (desde && hasta) cuando = `, del ${desde} al ${hasta}`;
     else if (desde) cuando = `, para el ${desde}`;
-    const text = `Hola DogDreams, quiero reservar ${servicio} para ${quien}, de tamaño ${tamano}${cuando}. ¿Tienen lugar?`;
+    const text = `Hola Dog DD, quiero reservar ${servicio} para ${quien}, de tamaño ${tamano}${cuando}. ¿Tienen lugar?`;
     out.textContent = text;
     send.href = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
   };
