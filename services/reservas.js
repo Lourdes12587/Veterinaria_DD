@@ -61,9 +61,13 @@ async function registrarEvento(citaId, tipo, detalle = null, conexion = db) {
  * @param {object} p.negocio  Configuración completa.
  * @param {object} p.datos    { servicio, profesional, inicio (ISO UTC), nombre, telefono, email, nota }
  * @param {Function} [p.obtenerBloqueos]  async ({ profesional, desde, hasta }) => [{ profesional, inicio, fin }] (Google, Fase 6)
- * @param {number} [p.ignorarCitaId]  Al cambiar una cita, no contarla como ocupada (Fase 4).
+ * @param {number} [p.reemplazaCitaId]  Al cambiar una cita: no cuenta como ocupada y se cancela
+ *                                     en la misma transacción que crea la nueva (si la nueva no entra,
+ *                                     la antigua sigue igual).
+ * @param {Date}   [p.privacidadAceptadaAt]  Al cambiar, se conserva la fecha en que aceptó.
  */
-async function reservar({ negocio, datos, ahora = new Date(), obtenerBloqueos = async () => [], ignorarCitaId = null }) {
+async function reservar({ negocio, datos, ahora = new Date(), obtenerBloqueos = async () => [], reemplazaCitaId = null, privacidadAceptadaAt = null }) {
+  const ignorarCitaId = reemplazaCitaId;
   const servicio = negocio.servicios.find((s) => s.id === datos.servicio);
   if (!servicio) throw new ErrorReserva("no_valido", "El servicio no existe.");
   const inicio = DateTime.fromISO(datos.inicio, { zone: "utc" });
@@ -112,15 +116,28 @@ async function reservar({ negocio, datos, ahora = new Date(), obtenerBloqueos = 
           clienteEmail: datos.email,
           nota: datos.nota || null,
         };
-        const [r] = await conexion.query(
-          `INSERT INTO citas (negocio, profesional, servicio, inicio, fin, fin_bloqueo,
-                              cliente_nombre, cliente_telefono, cliente_email, nota,
-                              estado, token_hash, privacidad_aceptada_at)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'confirmada', ?, ?)`,
-          [nueva.negocio, nueva.profesional, nueva.servicio, nueva.inicio, nueva.fin, nueva.finBloqueo,
-            nueva.clienteNombre, nueva.clienteTelefono, nueva.clienteEmail, nueva.nota, tokenHash, ahora],
-        );
-        return { id: r.insertId, ...nueva, estado: "confirmada" };
+        // Al cambiar, crear la nueva y cancelar la antigua es todo o nada.
+        if (reemplazaCitaId) await conexion.beginTransaction();
+        try {
+          const [r] = await conexion.query(
+            `INSERT INTO citas (negocio, profesional, servicio, inicio, fin, fin_bloqueo,
+                                cliente_nombre, cliente_telefono, cliente_email, nota,
+                                estado, token_hash, privacidad_aceptada_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'confirmada', ?, ?)`,
+            [nueva.negocio, nueva.profesional, nueva.servicio, nueva.inicio, nueva.fin, nueva.finBloqueo,
+              nueva.clienteNombre, nueva.clienteTelefono, nueva.clienteEmail, nueva.nota, tokenHash, privacidadAceptadaAt || ahora],
+          );
+          if (reemplazaCitaId) {
+            // "AND estado = 'confirmada'": si dos clics llegan a la vez, solo uno cambia la cita.
+            const [u] = await conexion.query("UPDATE citas SET estado = 'cancelada' WHERE id = ? AND negocio = ? AND estado = 'confirmada'", [reemplazaCitaId, negocio.slug]);
+            if (u.affectedRows !== 1) throw new ErrorReserva("ya_cambiada", "Esta cita ya se cambió o se canceló.");
+            await conexion.commit();
+          }
+          return { id: r.insertId, ...nueva, estado: "confirmada" };
+        } catch (e) {
+          if (reemplazaCitaId) await conexion.rollback().catch(() => {});
+          throw e;
+        }
       });
     } finally {
       conexion.release();
@@ -139,10 +156,40 @@ async function despuesDeReservar({ cita, token }) {
   console.log(`Cita #${cita.id} creada (${cita.profesional}, ${cita.inicio.toISOString()}). Enlace del cliente: ${base}/cita/${token}`);
 }
 
+// Cancelar: solo una cita confirmada. Devuelve true si la ha cancelado ahora.
+async function cancelar({ negocio, citaId }) {
+  const [u] = await db.query("UPDATE citas SET estado = 'cancelada' WHERE id = ? AND negocio = ? AND estado = 'confirmada'", [citaId, negocio.slug]);
+  return u.affectedRows === 1;
+}
+
+// Tareas después de cambiar o cancelar (Fase 5: email y n8n; Fase 6: Google).
+async function despuesDeCambiar({ anterior, cita, token }) {
+  await registrarEvento(anterior.id, "cambiada", { nueva: cita.id, inicioAnterior: anterior.inicio, inicioNuevo: cita.inicio });
+  await registrarEvento(cita.id, "creada", { cambiadaDesde: anterior.id, profesional: cita.profesional, servicio: cita.servicio });
+  const base = (process.env.URL_PUBLICA || `http://localhost:${process.env.PORT || 4000}`).trim().replace(/\/$/, "");
+  console.log(`Cita #${anterior.id} cambiada por #${cita.id} (${cita.profesional}, ${cita.inicio.toISOString()}). Enlace nuevo del cliente: ${base}/cita/${token}`);
+}
+
+async function despuesDeCancelar({ cita }) {
+  await registrarEvento(cita.id, "cancelada", { inicio: cita.inicio });
+  console.log(`Cita #${cita.id} cancelada por el cliente.`);
+}
+
 async function buscarPorToken(negocio, token) {
   if (typeof token !== "string" || !TOKEN.test(token)) return null;
   const [filas] = await db.query("SELECT * FROM citas WHERE negocio = ? AND token_hash = ? LIMIT 1", [negocio.slug, hashToken(token)]);
   return filas[0] || null;
 }
 
-module.exports = { reservar, despuesDeReservar, buscarPorToken, registrarEvento, ErrorReserva, hashToken, conCandado };
+module.exports = {
+  reservar,
+  cancelar,
+  despuesDeReservar,
+  despuesDeCambiar,
+  despuesDeCancelar,
+  buscarPorToken,
+  registrarEvento,
+  ErrorReserva,
+  hashToken,
+  conCandado,
+};

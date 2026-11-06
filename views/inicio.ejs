@@ -184,122 +184,17 @@
       </section>
 
       <!-- Reserva: agenda con cita previa (peluquería y veterinaria) -->
-      <% const r = reserva; const v = r.valores || {}; %>
-      <section class="compose" id="reservar" aria-labelledby="reservar-titulo" data-agenda>
-        <script type="application/json" id="agenda-datos"><%- JSON.stringify({ slug: negocio.slug, zona: negocio.zonaHoraria, servicios: negocio.servicios, profesionales: negocio.profesionales.map(({ id, nombre, servicios }) => ({ id, nombre, servicios })) }).replace(/</g, "\u003c") %></script>
-        <div class="compose__controls">
-          <h2 class="head" id="reservar-titulo" data-reveal>Pide cita</h2>
-          <p class="compose__intro" data-reveal style="--d: 1">
-            Peluquería y veterinaria con cita previa. Elige el servicio, el día y la hora: la cita queda confirmada al momento.
-          </p>
-
-          <p class="compose__aviso" role="alert" data-aviso <%= r.error ? '' : 'hidden' %>><%= r.error || '' %></p>
-
-          <!-- Qué, con quién y cuándo. Sin JavaScript, "Ver horas" recarga la página con lo elegido. -->
-          <form class="compose__form" method="get" action="/#reservar" data-seleccion data-reveal style="--d: 2">
-            <fieldset>
-              <legend>Servicio</legend>
-              <div class="choices">
-                <% r.servicios.forEach((s) => { %>
-                  <label class="choice">
-                    <input type="radio" name="servicio" value="<%= s.id %>" <%= s.id === r.seleccion.servicio ? 'checked' : '' %> />
-                    <span><%= s.nombre %> · <%= s.minutos %> min · <%= s.precio %></span>
-                  </label>
-                <% }) %>
-              </div>
-            </fieldset>
-
-            <fieldset>
-              <legend>Profesional</legend>
-              <div class="choices" data-profesionales>
-                <label class="choice">
-                  <input type="radio" name="profesional" value="cualquiera" <%= r.seleccion.profesional === 'cualquiera' ? 'checked' : '' %> />
-                  <span>Cualquiera</span>
-                </label>
-                <% r.profesionales.forEach((p) => { %>
-                  <label class="choice">
-                    <input type="radio" name="profesional" value="<%= p.id %>" <%= p.id === r.seleccion.profesional ? 'checked' : '' %> />
-                    <span><%= p.nombre %></span>
-                  </label>
-                <% }) %>
-              </div>
-            </fieldset>
-
-            <fieldset>
-              <legend>Día</legend>
-              <div class="choices" data-dias>
-                <% r.dias.forEach((d) => { %>
-                  <label class="choice">
-                    <input type="radio" name="fecha" value="<%= d.fecha %>" <%= d.disponible ? '' : 'disabled' %> <%= d.fecha === r.seleccion.fecha ? 'checked' : '' %> />
-                    <span><%= d.etiqueta %></span>
-                  </label>
-                <% }) %>
-              </div>
-              <p class="small muted" data-sin-dias <%= !r.caida && r.dias.length && !r.seleccion.fecha ? '' : 'hidden' %>>No quedan días libres para este servicio. Prueba con otro profesional o llámanos al <%= negocio.telefono %>.</p>
-            </fieldset>
-
-            <button class="button" type="submit" data-sinjs>Ver horas</button>
-          </form>
-
-          <!-- Hora y datos. Es un POST normal: funciona aunque falle el JavaScript. -->
-          <form class="compose__form" method="post" action="/reservar#reservar" id="form-reserva" data-reserva>
-            <input type="hidden" name="servicio" value="<%= r.seleccion.servicio %>" />
-            <input type="hidden" name="profesional" value="<%= r.seleccion.profesional %>" />
-
-            <fieldset>
-              <legend>Hora</legend>
-              <div class="choices" data-horas>
-                <% r.huecos.forEach((h) => { %>
-                  <label class="choice">
-                    <input type="radio" name="inicio" value="<%= h.inicio %>" required <%= h.inicio === r.seleccion.inicio ? 'checked' : '' %> />
-                    <span><%= h.hora %></span>
-                  </label>
-                <% }) %>
-              </div>
-              <p class="small muted" data-sin-horas <%= r.seleccion.fecha && !r.huecos.length ? '' : 'hidden' %>>Ese día ya no quedan horas. Elige otro día.</p>
-            </fieldset>
-
-            <fieldset>
-              <legend>Tus datos</legend>
-              <div class="fields">
-                <label class="field-label">
-                  Nombre
-                  <input class="field" type="text" name="nombre" required minlength="2" maxlength="120" autocomplete="name" value="<%= v.nombre || '' %>" />
-                </label>
-                <label class="field-label">
-                  Teléfono
-                  <input class="field" type="tel" name="telefono" required pattern="\+?[0-9 \(\)\-]{9,20}" maxlength="20" autocomplete="tel" placeholder="600 000 000" value="<%= v.telefono || '' %>" />
-                </label>
-                <label class="field-label">
-                  Email
-                  <input class="field" type="email" name="email" required maxlength="254" autocomplete="email" value="<%= v.email || '' %>" />
-                </label>
-              </div>
-            </fieldset>
-
-            <label class="field-label">
-              Nota (opcional): nombre y raza de tu mascota
-              <textarea class="field" name="nota" rows="2" maxlength="500" placeholder="Mora, caniche"><%= v.nota || '' %></textarea>
-              <span class="small">No escribas aquí información médica.</span>
-            </label>
-
-            <label class="compose__check">
-              <input type="checkbox" name="privacidad" value="si" required <%= v.privacidad ? 'checked' : '' %> />
-              <span>He leído y acepto la <a href="/privacidad" target="_blank" rel="noopener">política de privacidad</a>.</span>
-            </label>
-
-            <!-- Trampa para bots: oculto a personas y lectores de pantalla. -->
-            <div class="sr-only" aria-hidden="true">
-              <label>No rellenes este campo <input type="text" name="web" tabindex="-1" autocomplete="off" /></label>
-            </div>
-          </form>
-        </div>
-
-        <div class="compose__preview" data-reveal style="--d: 1">
-          <p class="compose__message" data-resumen aria-live="polite"><%= r.resumen %></p>
-          <button class="button" type="submit" form="form-reserva" data-confirmar <%= r.caida ? 'disabled' : '' %>>Confirmar cita</button>
-        </div>
-      </section>
+      <%- include("partials/selector-cita", {
+        seccionId: "reservar",
+        titulo: "Pide cita",
+        intro: "Peluquería y veterinaria con cita previa. Elige el servicio, el día y la hora: la cita queda confirmada al momento.",
+        accionGet: "/#reservar",
+        ocultosGet: {},
+        accionPost: "/reservar#reservar",
+        conDatos: true,
+        boton: "Confirmar cita",
+        token: null,
+      }) %>
 
       <!-- Contacto: WhatsApp como tipografía -->
       <section class="contact" id="contacto" aria-label="Contacto">

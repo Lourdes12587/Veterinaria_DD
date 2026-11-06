@@ -1,0 +1,61 @@
+<%- include("partials/cabeza-agenda", { titulo: vista === "cancelada" ? "Cita cancelada" : "Tu cita" }) %>
+    <% const tel = negocio.telefono.replace(/\s/g, ''); %>
+    <main>
+      <section class="compose" aria-labelledby="titulo">
+        <div class="compose__controls">
+          <p class="small muted"><a class="link" href="/"><%= negocio.nombre %></a></p>
+          <h1 class="head" id="titulo"><%= vista === "cancelada" ? "Cita cancelada" : "Tu cita" %></h1>
+
+          <% if (mensaje) { %><p class="compose__aviso" role="status"><%= mensaje %></p><% } %>
+
+          <p class="compose__message">
+            <%= cita.servicio %> con <%= cita.profesional %>,<br />
+            el <%= cita.fecha %> a las <%= cita.hora %>.
+          </p>
+          <p class="muted">A nombre de <%= cita.cliente %>.<% if (cita.minutos) { %> <%= cita.minutos %> min · <%= cita.precio %>.<% } %></p>
+
+          <% if (vista === "cancelada") { %>
+            <p class="compose__intro">Esta cita ya no está activa. Si la cambiaste por otra, usa el enlace de la cita nueva.</p>
+          <% } else if (vista === "cerca") { %>
+            <p class="compose__intro">
+              Faltan menos de <%= negocio.cancelacionMinimaHoras %> horas. Para cambiarla o cancelarla, llama al
+              <a class="link" href="tel:<%= tel %>"><%= negocio.telefono %></a>.
+            </p>
+          <% } %>
+        </div>
+
+        <div class="compose__preview">
+          <% if (vista === "activa") { %>
+            <a class="button" href="/cita/<%= token %>?cambiar=1#cambiar">Cambiar día u hora</a>
+            <form method="post" action="/cita/<%= token %>/cancelar">
+              <button class="link-plain" type="submit">Cancelar la cita</button>
+            </form>
+            <a class="link" href="/cita/<%= token %>/cita.ics" download>Añadir a mi calendario</a>
+          <% } else if (vista === "cerca") { %>
+            <a class="button" href="tel:<%= tel %>">Llamar al <%= negocio.telefono %></a>
+          <% } else if (vista === "cancelada") { %>
+            <a class="button" href="/#reservar">Pedir otra cita</a>
+          <% } else { %>
+            <a class="link" href="/cita/<%= token %>">Volver sin cambiar</a>
+          <% } %>
+        </div>
+      </section>
+
+      <% if (vista === "cambiar") { %>
+        <%- include("partials/selector-cita", {
+          reserva,
+          seccionId: "cambiar",
+          titulo: "Elige la nueva hora",
+          intro: "Tu cita actual sigue reservada hasta que confirmes la nueva.",
+          accionGet: "/cita/" + token + "#cambiar",
+          ocultosGet: { cambiar: "1" },
+          accionPost: "/cita/" + token + "/cambiar#cambiar",
+          conDatos: false,
+          boton: "Cambiar a esta hora",
+          token,
+        }) %>
+      <% } %>
+    </main>
+    <% if (vista === "cambiar") { %><script src="/resources/js/inicio.js" defer></script><% } %>
+  </body>
+</html>

@@ -108,7 +108,7 @@ const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   };
 
   async function api(ruta, params) {
-    const r = await fetch(`/api/${encodeURIComponent(datos.slug)}/${ruta}?${new URLSearchParams(params)}`, { headers: { Accept: "application/json" } });
+    const r = await fetch(`/api/${encodeURIComponent(datos.slug)}/${ruta}?${new URLSearchParams(params)}`, { headers: { Accept: "application/json", ...(datos.token ? { "X-Cita-Token": datos.token } : {}) } });
     const j = await r.json().catch(() => ({}));
     if (!r.ok) throw new Error(j.error || "No se pudo cargar la agenda. Inténtalo de nuevo.");
     return j;
