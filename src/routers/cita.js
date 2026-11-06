@@ -73,6 +73,7 @@ module.exports = function crearRouterCita(negocio) {
             seleccion: { profesional: cita.profesional, fecha: DateTime.fromJSDate(cita.inicio, { zone: zona }).toISODate(), ...seleccion },
             servicioFijo: cita.servicio,
             excluirId: cita.id,
+            ignorarEvento: { profesional: cita.profesional, inicio: cita.inicio, fin: cita.fin },
             error: aviso,
           })
         : null;
@@ -152,6 +153,7 @@ module.exports = function crearRouterCita(negocio) {
             nota: cita.nota,
           },
           reemplazaCitaId: cita.id,
+          ignorarEvento: { profesional: cita.profesional, inicio: cita.inicio, fin: cita.fin },
           privacidadAceptadaAt: cita.privacidad_aceptada_at,
         });
         despuesDeCambiar(negocio, { anterior: cita, ...resultado }).catch((e) => console.error("Error después de cambiar:", e.message));
@@ -163,7 +165,7 @@ module.exports = function crearRouterCita(negocio) {
           if (e.codigo === "ocupado") return responder(409, "Esa hora se acaba de ocupar. Elige otra: tu cita actual sigue igual.", { codigo: "ocupado" });
           if (e.codigo === "ya_cambiada") return quiereJson(req) ? res.status(409).json({ error: e.message }) : res.redirect(303, `/cita/${req.params.token}`);
           if (e.codigo === "no_valido") return responder(400, e.message);
-          if (e.codigo === "candado") return responder(503, e.message);
+          if (e.codigo === "candado" || e.codigo === "calendario") return responder(503, e.message);
           console.error("Configuración incompleta:", e.message);
         } else {
           console.error("Error al cambiar la cita:", e.code || e.message);

@@ -15,6 +15,7 @@ const { calcularHuecos } = require("./disponibilidad");
 const { candidatos, citasEntre } = require("./citas");
 const { registrarEvento } = require("./eventos");
 const notificaciones = require("./notificaciones");
+const calendario = require("./calendario");
 
 const ESPERA_CANDADO_S = 5;
 const TOKEN = /^[A-Za-z0-9_-]{43}$/; // 32 bytes en base64url
@@ -22,7 +23,7 @@ const TOKEN = /^[A-Za-z0-9_-]{43}$/; // 32 bytes en base64url
 class ErrorReserva extends Error {
   constructor(codigo, mensaje) {
     super(mensaje);
-    this.codigo = codigo; // "no_valido" | "ocupado" | "candado" | "configuracion"
+    this.codigo = codigo; // "no_valido" | "ocupado" | "candado" | "calendario" | "ya_cambiada" | "configuracion"
   }
 }
 
@@ -55,13 +56,13 @@ async function conCandado(conexion, nombre, fn) {
  * Reserva un hueco. Lanza ErrorReserva si no se puede.
  * @param {object} p.negocio  Configuración completa.
  * @param {object} p.datos    { servicio, profesional, inicio (ISO UTC), nombre, telefono, email, nota }
- * @param {Function} [p.obtenerBloqueos]  async ({ profesional, desde, hasta }) => [{ profesional, inicio, fin }] (Google, Fase 6)
+ * @param {object} [p.ignorarEvento]  { profesional, inicio, fin } del evento propio en Google al cambiar una cita.
  * @param {number} [p.reemplazaCitaId]  Al cambiar una cita: no cuenta como ocupada y se cancela
  *                                     en la misma transacción que crea la nueva (si la nueva no entra,
  *                                     la antigua sigue igual).
  * @param {Date}   [p.privacidadAceptadaAt]  Al cambiar, se conserva la fecha en que aceptó.
  */
-async function reservar({ negocio, datos, ahora = new Date(), obtenerBloqueos = async () => [], reemplazaCitaId = null, privacidadAceptadaAt = null }) {
+async function reservar({ negocio, datos, ahora = new Date(), reemplazaCitaId = null, ignorarEvento = null, privacidadAceptadaAt = null }) {
   const ignorarCitaId = reemplazaCitaId;
   const servicio = negocio.servicios.find((s) => s.id === datos.servicio);
   if (!servicio) throw new ErrorReserva("no_valido", "El servicio no existe.");
@@ -93,7 +94,15 @@ async function reservar({ negocio, datos, ahora = new Date(), obtenerBloqueos = 
     try {
       cita = await conCandado(conexion, `agenda:${negocio.slug}:${profesional}`, async () => {
         const citas = await citasEntre({ negocio, profesionales: [profesional], desde, hasta, conexion, excluirId: ignorarCitaId });
-        const bloqueos = await obtenerBloqueos({ profesional, desde, hasta });
+        // Bloqueos de Google, sin caché. Si Google no responde, no se reserva:
+        // mejor un "inténtalo luego" que una cita encima de unas vacaciones.
+        let bloqueos;
+        try {
+          bloqueos = await calendario.obtenerBloqueos(negocio, { profesionales: [profesional], desde, hasta, ignorar: ignorarEvento, fresco: true });
+        } catch (e) {
+          console.error("Google Calendar (reservar):", e.message);
+          throw new ErrorReserva("calendario", "No hemos podido comprobar la agenda ahora mismo. Inténtalo de nuevo en unos minutos.");
+        }
         const libres = calcularHuecos({ negocio, servicioId: servicio.id, profesionalId: profesional, fecha, citas, bloqueos, ahora });
         if (!libres.some((h) => h.inicio === inicioIso)) return null;
 
@@ -143,8 +152,8 @@ async function reservar({ negocio, datos, ahora = new Date(), obtenerBloqueos = 
 }
 
 // Tareas después de soltar el candado. Si fallan, la cita sigue siendo válida
-// y el error queda apuntado en "eventos" (lo hace services/notificaciones.js).
-// Fase 6: aquí se añadirá el evento de Google Calendar.
+// y el error queda apuntado en "eventos" (lo hace services/notificaciones.js:
+// Google Calendar, email y aviso a n8n).
 async function despuesDeReservar(negocio, { cita, token }) {
   await registrarEvento(cita.id, "creada", { profesional: cita.profesional, servicio: cita.servicio });
   await notificaciones.alReservar(negocio, { cita, token });

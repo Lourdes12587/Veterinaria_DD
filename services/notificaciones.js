@@ -1,6 +1,7 @@
 // Lo que pasa después de reservar, cambiar o cancelar (ya sin candado):
-// email al cliente y aviso al negocio. Cada paso es independiente: si uno
-// falla, se apunta en "eventos" (error_email, error_aviso) y se sigue.
+// evento en Google Calendar, email al cliente y aviso al negocio. Cada paso es
+// independiente: si uno falla, se apunta en "eventos" (error_calendar,
+// error_email, error_aviso) y se sigue.
 // La cita ya está guardada y es válida pase lo que pase aquí.
 const db = require("../config/db");
 const { enviarEmail } = require("./email");
@@ -9,6 +10,7 @@ const plantillas = require("./plantillas-email");
 const { icsDeCita } = require("./ics");
 const { registrarEvento } = require("./eventos");
 const fmt = require("./formato");
+const calendario = require("./calendario");
 
 async function cargarCita(id) {
   const [filas] = await db.query("SELECT * FROM citas WHERE id = ?", [id]);
@@ -53,9 +55,15 @@ function datosAviso(negocio, cita) {
   };
 }
 
+const guardarEventoId = (citaId, eventId) => db.query("UPDATE citas SET google_event_id = ? WHERE id = ?", [eventId, citaId]);
+
 async function alReservar(negocio, { cita: { id }, token }) {
   const cita = await cargarCita(id);
   if (!cita) return;
+  await intentar(id, "error_calendar", "crear evento", async () => {
+    const eventId = await calendario.crearEvento(negocio, cita);
+    if (eventId) await guardarEventoId(id, eventId);
+  });
   await intentar(id, "error_email", "confirmación", () =>
     enviarEmail({ to: cita.cliente_email, replyTo: negocio.emailNegocio, ...plantillas.confirmacion(negocio, cita, token), attachments: [adjuntoIcs(negocio, cita)] }),
   );
@@ -65,6 +73,12 @@ async function alReservar(negocio, { cita: { id }, token }) {
 async function alCambiar(negocio, { anteriorId, nuevaId, token }) {
   const [anterior, cita] = await Promise.all([cargarCita(anteriorId), cargarCita(nuevaId)]);
   if (!anterior || !cita) return;
+  // El evento de Google pasa de la cita anterior a la nueva (se mueve, no se duplica).
+  await intentar(nuevaId, "error_calendar", "mover evento", async () => {
+    const eventId = await calendario.moverEvento(negocio, anterior, cita);
+    await guardarEventoId(anteriorId, null);
+    if (eventId) await guardarEventoId(nuevaId, eventId);
+  });
   await intentar(nuevaId, "error_email", "cambio", () =>
     enviarEmail({ to: cita.cliente_email, replyTo: negocio.emailNegocio, ...plantillas.cambio(negocio, cita, token, anterior), attachments: [adjuntoIcs(negocio, cita)] }),
   );
@@ -76,6 +90,9 @@ async function alCambiar(negocio, { anteriorId, nuevaId, token }) {
 async function alCancelar(negocio, { citaId }) {
   const cita = await cargarCita(citaId);
   if (!cita) return;
+  await intentar(citaId, "error_calendar", "borrar evento", async () => {
+    if (await calendario.borrarEvento(negocio, cita)) await guardarEventoId(citaId, null);
+  });
   await intentar(citaId, "error_email", "cancelación", () => enviarEmail({ to: cita.cliente_email, replyTo: negocio.emailNegocio, ...plantillas.cancelacion(negocio, cita) }));
   await intentar(citaId, "error_aviso", "cancelación", () => avisarNegocio("cancelacion", datosAviso(negocio, cita)));
 }

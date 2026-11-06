@@ -8,6 +8,7 @@ const { calcularHuecos, calcularDias, fechasVisibles } = require("../../services
 const { candidatos, citasEntre } = require("../../services/citas");
 const { etiquetaDia } = require("../../services/formato");
 const { buscarPorToken } = require("../../services/reservas");
+const calendario = require("../../services/calendario");
 
 module.exports = function crearRouterAgenda(negocio) {
   const router = express.Router();
@@ -61,13 +62,14 @@ module.exports = function crearRouterAgenda(negocio) {
 
   // Al cambiar una cita, la página envía su token en la cabecera X-Cita-Token
   // (no en la URL, para que no quede en los registros del servidor):
-  // así su propia hora no cuenta como ocupada.
+  // así su propia hora no cuenta como ocupada (ni en MySQL ni en Google).
   async function citaPropia(req) {
     const token = req.get("X-Cita-Token");
     if (!token) return null;
     const cita = await buscarPorToken(negocio, token);
-    return cita && cita.estado === "confirmada" ? cita.id : null;
+    return cita && cita.estado === "confirmada" ? cita : null;
   }
+  const ignorarDe = (c) => (c ? { profesional: c.profesional, inicio: c.inicio, fin: c.fin } : null);
 
   // Horas libres de un día.
   router.get("/:slug/huecos", limiteConsultas, validarServicio, validarProfesional, validarFecha, async (req, res) => {
@@ -76,8 +78,12 @@ module.exports = function crearRouterAgenda(negocio) {
     const fecha = req.query.fecha;
     const dia = DateTime.fromISO(fecha, { zone: negocio.zonaHoraria });
     try {
-      const citas = await citasEntre({ negocio, profesionales: p.ids, desde: dia.toJSDate(), hasta: dia.plus({ days: 1 }).toJSDate(), excluirId: await citaPropia(req) });
-      const bloqueos = []; // Google Calendar (freebusy) llega en la Fase 6.
+      const propia = await citaPropia(req);
+      const rango = { desde: dia.toJSDate(), hasta: dia.plus({ days: 1 }).toJSDate() };
+      const [citas, bloqueos] = await Promise.all([
+        citasEntre({ negocio, profesionales: p.ids, ...rango, excluirId: propia && propia.id }),
+        calendario.bloqueosParaMostrar(negocio, { profesionales: p.ids, ...rango, ignorar: ignorarDe(propia) }),
+      ]);
       const huecos = calcularHuecos({ negocio, servicioId: p.servicioId, profesionalId: p.profesionalId, fecha, citas, bloqueos, ahora: new Date() });
       res.json({ fecha, servicio: p.servicioId, profesional: p.profesionalId, zonaHoraria: negocio.zonaHoraria, huecos });
     } catch (e) {
@@ -94,8 +100,13 @@ module.exports = function crearRouterAgenda(negocio) {
     const desde = DateTime.fromISO(fechas[0], { zone: negocio.zonaHoraria });
     const hasta = DateTime.fromISO(fechas.at(-1), { zone: negocio.zonaHoraria }).plus({ days: 1 });
     try {
-      const citas = await citasEntre({ negocio, profesionales: p.ids, desde: desde.toJSDate(), hasta: hasta.toJSDate(), excluirId: await citaPropia(req) });
-      const dias = calcularDias({ negocio, servicioId: p.servicioId, profesionalId: p.profesionalId, citas, bloqueos: [], ahora })
+      const propia = await citaPropia(req);
+      const rango = { desde: desde.toJSDate(), hasta: hasta.toJSDate() };
+      const [citas, bloqueos] = await Promise.all([
+        citasEntre({ negocio, profesionales: p.ids, ...rango, excluirId: propia && propia.id }),
+        calendario.bloqueosParaMostrar(negocio, { profesionales: p.ids, ...rango, ignorar: ignorarDe(propia) }),
+      ]);
+      const dias = calcularDias({ negocio, servicioId: p.servicioId, profesionalId: p.profesionalId, citas, bloqueos, ahora })
         .map((d) => ({ ...d, etiqueta: etiquetaDia(d.fecha, negocio.zonaHoraria) }));
       res.json({ servicio: p.servicioId, profesional: p.profesionalId, dias });
     } catch (e) {

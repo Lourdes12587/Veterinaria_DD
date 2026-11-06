@@ -93,7 +93,7 @@ module.exports = function crearRouterReservar(negocio) {
         if (e instanceof ErrorReserva) {
           if (e.codigo === "ocupado") return responderError(req, res, 409, e.message, { codigo: "ocupado" });
           if (e.codigo === "no_valido") return responderError(req, res, 400, e.message);
-          if (e.codigo === "candado") return responderError(req, res, 503, e.message);
+          if (e.codigo === "candado" || e.codigo === "calendario") return responderError(req, res, 503, e.message);
           console.error("Configuración incompleta:", e.message);
         } else {
           console.error("Error al reservar:", e.code || e.message);

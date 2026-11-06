@@ -5,6 +5,7 @@ const { DateTime } = require("luxon");
 const { calcularHuecos, calcularDias, fechasVisibles } = require("./disponibilidad");
 const { candidatos, citasEntre } = require("./citas");
 const fmt = require("./formato");
+const calendario = require("./calendario");
 
 function crearModeloReserva(negocio) {
   const zona = negocio.zonaHoraria;
@@ -17,8 +18,9 @@ function crearModeloReserva(negocio) {
    * @param {string} [o.error]
    * @param {string} [o.servicioFijo]  Solo se ofrece este servicio (al cambiar una cita).
    * @param {number} [o.excluirId]     Cita que no cuenta como ocupada (la que se está cambiando).
+   * @param {object} [o.ignorarEvento] { profesional, inicio, fin } de su evento en Google.
    */
-  return async function modeloReserva({ seleccion = {}, valores = {}, error = null, servicioFijo = null, excluirId = null } = {}) {
+  return async function modeloReserva({ seleccion = {}, valores = {}, error = null, servicioFijo = null, excluirId = null, ignorarEvento = null } = {}) {
     const servicio = servicioDe(servicioFijo) || servicioDe(seleccion.servicio) || negocio.servicios[0];
     const pros = candidatos(negocio, servicio.id);
     const profesional = pros.some((p) => p.id === seleccion.profesional) ? seleccion.profesional : "cualquiera";
@@ -39,15 +41,14 @@ function crearModeloReserva(negocio) {
     const fechas = fechasVisibles(negocio, ahora);
     const desde = DateTime.fromISO(fechas[0], { zone: zona });
     const hasta = DateTime.fromISO(fechas.at(-1), { zone: zona }).plus({ days: 1 });
+    const ids = candidatos(negocio, servicio.id, profesional).map((p) => p.id);
     let citas;
+    let bloqueos;
     try {
-      citas = await citasEntre({
-        negocio,
-        profesionales: candidatos(negocio, servicio.id, profesional).map((p) => p.id),
-        desde: desde.toJSDate(),
-        hasta: hasta.toJSDate(),
-        excluirId,
-      });
+      [citas, bloqueos] = await Promise.all([
+        citasEntre({ negocio, profesionales: ids, desde: desde.toJSDate(), hasta: hasta.toJSDate(), excluirId }),
+        calendario.bloqueosParaMostrar(negocio, { profesionales: ids, desde: desde.toJSDate(), hasta: hasta.toJSDate(), ignorar: ignorarEvento }),
+      ]);
     } catch (e) {
       console.error("Error al leer citas:", e.code || e.message);
       modelo.caida = true;
@@ -55,7 +56,7 @@ function crearModeloReserva(negocio) {
       return modelo;
     }
 
-    const base = { negocio, servicioId: servicio.id, profesionalId: profesional, citas, bloqueos: [], ahora };
+    const base = { negocio, servicioId: servicio.id, profesionalId: profesional, citas, bloqueos, ahora };
     modelo.dias = calcularDias(base).map((d) => ({ ...d, etiqueta: fmt.etiquetaDia(d.fecha, zona) }));
     const libres = modelo.dias.filter((d) => d.disponible).map((d) => d.fecha);
     const fecha = libres.includes(seleccion.fecha) ? seleccion.fecha : libres[0] || null;
