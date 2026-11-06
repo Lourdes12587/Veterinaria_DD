@@ -6,6 +6,8 @@ const { comprobarConexion } = require("./config/db");
 const { iniciarRecordatorios } = require("./services/recordatorios");
 const { modoConsola } = require("./services/email");
 const { estadoConfiguracion } = require("./services/calendario");
+const { iniciarLimpieza } = require("./services/limpieza");
+const helmet = require("helmet");
 //const { swaggerJSDoc, swaggerUi, swaggerSpec } = require("./swagger");
 //const http = require ("http");
 //const server = http.createServer(app);
@@ -31,7 +33,40 @@ app.listen(4000, () => {
     google.avisos.forEach((a) => console.warn(`Aviso: ${a}`));
     comprobarConexion();
     iniciarRecordatorios(negocio.completo);
+    iniciarLimpieza(negocio.completo);
 });
+
+// Detrás de Nginx: la IP real del cliente llega en X-Forwarded-For. Con 1 se
+// confía solo en el primer proxy; sin esto, el límite por IP contaría a todos
+// los visitantes como uno (la IP de Nginx).
+app.set("trust proxy", 1);
+
+// Cabeceras de seguridad. La CSP solo permite:
+// - scripts propios y el script en línea que añade la clase "js" (por su hash),
+// - estilos propios, de Google Fonts y en atributos style="" (los usa el diseño),
+// - fuentes de Google Fonts y peticiones (fetch) a este mismo servidor.
+const scriptJs = 'document.documentElement.classList.add("js");';
+const hashScriptJs = `'sha256-${require("crypto").createHash("sha256").update(scriptJs).digest("base64")}'`;
+app.use(
+    helmet({
+        contentSecurityPolicy: {
+            directives: {
+                "default-src": ["'self'"],
+                "script-src": ["'self'", hashScriptJs],
+                "style-src": ["'self'", "https://fonts.googleapis.com", "'unsafe-inline'"],
+                "font-src": ["'self'", "https://fonts.gstatic.com"],
+                "img-src": ["'self'", "data:"],
+                "connect-src": ["'self'"],
+                "form-action": ["'self'"],
+                "frame-ancestors": ["'none'"],
+                // Sin esto, el móvil en la red local (http://192.168…) pediría
+                // el CSS y el JS por https y la página saldría sin estilos.
+                // En producción, Nginx redirige a https.
+                "upgrade-insecure-requests": null,
+            },
+        },
+    }),
+);
 
 //app.use(cookieSession({
 //    name: 'session',

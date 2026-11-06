@@ -9,4 +9,8 @@ router.get("/quienessomos", (req, res) => {
   res.redirect("/#experiencia");
 });
 
+router.get("/privacidad", (req, res) => {
+  res.render("privacidad");
+});
+
 module.exports = router;

@@ -53,6 +53,8 @@ h1, h2, h3 { font-family: var(--font-display); font-weight: 700; letter-spacing:
 .small { font-size: var(--step-small); line-height: 1.4; }
 .muted { color: var(--muted); }
 p { max-width: 62ch; text-wrap: pretty; }
+/* Banda superior de la demo (etiquetaDemo: true). */
+.banda-demo { max-width: none; padding: 0.5rem var(--margin); background: var(--accent); color: var(--accent-ink); font-size: var(--step-small); font-weight: 500; text-align: center; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
 /* ---------- controles ---------- */

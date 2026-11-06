@@ -1,0 +1,49 @@
+<%- include("partials/cabeza-agenda", { titulo: "Política de privacidad" }) %>
+    <% const tel = negocio.telefono.replace(/\s/g, ''); %>
+    <main>
+      <section class="compose" aria-labelledby="titulo">
+        <div class="compose__controls">
+          <p class="small muted"><a class="link" href="/"><%= negocio.nombre %></a></p>
+          <h1 class="head" id="titulo">Política de privacidad</h1>
+
+          <% if (negocio.etiquetaDemo) { %>
+            <p class="compose__aviso">
+              Esta web es una demostración de Creaciones Digitales y <%= negocio.nombre %> es un negocio ficticio.
+              Las citas no son reales: no uses datos de otras personas. Las citas de prueba se borran a los 30 días.
+            </p>
+          <% } %>
+
+          <h2>Quién trata tus datos</h2>
+          <p><%= negocio.nombre %><% if (negocio.subtitulo) { %> (<%= negocio.subtitulo.toLowerCase() %>)<% } %>.
+            Para cualquier consulta sobre tus datos, llámanos al
+            <a class="link" href="tel:<%= tel %>"><%= negocio.telefono %></a> o responde a cualquiera de los emails que te enviamos.</p>
+
+          <h2>Qué datos pedimos y para qué</h2>
+          <p>Al pedir cita nos das tu nombre, teléfono y email, y si quieres una nota con el nombre y la raza de tu mascota.
+            Los usamos solo para gestionar la cita: confirmarla, enviarte un recordatorio, avisarte de cambios y contactarte si hace falta.
+            No pedimos información médica: no la escribas en la nota.</p>
+
+          <h2>Por qué podemos usarlos</h2>
+          <p>Porque nos pides una cita (ejecución de lo que solicitas) y porque marcas la casilla de aceptación al reservar.
+            No los usamos para publicidad ni los vendemos.</p>
+
+          <h2>Quién más los ve</h2>
+          <p>Proveedores que nos ayudan a darte el servicio y que solo pueden usarlos para eso:
+            el servicio de envío de emails, el calendario donde el equipo ve sus citas y el sistema que nos avisa de cada reserva,
+            además del alojamiento de la web. Algunos pueden estar fuera de la Unión Europea, con las garantías que exige la ley.</p>
+
+          <h2>Cuánto tiempo los guardamos</h2>
+          <p>Mientras la cita esté activa y el tiempo necesario después para atender cualquier consulta o cumplir obligaciones legales.
+            <% if (negocio.etiquetaDemo) { %>En esta demo, las citas se borran automáticamente 30 días después de crearse.<% } %></p>
+
+          <h2>Tus derechos</h2>
+          <p>Puedes pedir ver, corregir o borrar tus datos, oponerte a su uso, limitarlo o recibirlos en un formato portable.
+            Si crees que no los tratamos bien, puedes reclamar ante la Agencia Española de Protección de Datos
+            (<a class="link" href="https://www.aepd.es" rel="noopener">aepd.es</a>).</p>
+
+          <p><a class="button" href="/#reservar">Volver a la agenda</a></p>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

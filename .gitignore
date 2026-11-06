@@ -2,3 +2,8 @@ node_modules
 env/*
 !env/.env.example
 .taste-skill
+
+# Claves de Google (deben estar fuera del proyecto; esto es una red de seguridad)
+*-sa.json
+*service-account*.json
+credenciales/
