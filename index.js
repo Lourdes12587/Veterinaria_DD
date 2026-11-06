@@ -56,6 +56,7 @@ app.use(express.json());
 app.use("/", require("./src/routers/inicio"));
 app.use("/", require("./src/routers/peluqueria"));
 app.use("/", require("./src/routers/servicios"));
+app.use("/api", require("./src/routers/agenda")(negocio.completo));
 
 
 
