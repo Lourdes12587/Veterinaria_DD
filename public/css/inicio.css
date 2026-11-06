@@ -201,7 +201,6 @@ p { max-width: 62ch; text-wrap: pretty; }
 .contact__lead { font-size: var(--step-lead); line-height: 1.2; max-width: 26ch; font-weight: 500; }
 .contact__mail { align-self: end; max-width: none; padding-bottom: 6vh; font-family: var(--font-display); font-weight: 700; font-size: var(--step-display); line-height: 0.85; letter-spacing: -0.03em; }
 .contact__mail a { text-decoration: none; transition: color var(--t-hover) ease; }
-.contact__mail span { display: block; }
 @media (hover: hover) and (pointer: fine) {
   .contact__mail a:hover { color: #ffffff; }
 }

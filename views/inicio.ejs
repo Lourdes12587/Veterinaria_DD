@@ -1,7 +1,6 @@
 <%
   const img = (name) => "/resources/img/" + encodeURIComponent(name);
   const whatsapp = "https://wa.me/";
-  const email = "DogDD@gmail.com";
 
   const servicios = [
     {
@@ -242,19 +241,14 @@
         </div>
       </section>
 
-      <!-- Contacto: el correo como tipografía -->
+      <!-- Contacto: WhatsApp como tipografía -->
       <section class="contact" id="contacto" aria-label="Contacto">
         <p class="contact__lead" data-reveal>
           Escríbenos para reservar, preguntar un precio o venir a conocer la casa.
         </p>
         <p class="contact__mail" data-reveal style="--d: 1">
-          <a href="mailto:<%= email %>?subject=Consulta%20para%20Dog%20DD">DogDD@<wbr /><span>gmail.com</span></a>
+          <a href="<%= whatsapp %>" target="_blank" rel="noopener">WhatsApp</a>
         </p>
-        <div class="contact__foot" data-reveal style="--d: 2">
-          <p class="contact__links">
-            <a class="link-plain" href="<%= whatsapp %>" target="_blank" rel="noopener">WhatsApp</a>
-          </p>
-        </div>
       </section>
     </main>
 
