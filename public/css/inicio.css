@@ -98,22 +98,15 @@ p { max-width: 62ch; text-wrap: pretty; }
 .hero__foot .button { min-height: 3.75rem; padding: 0 1.75rem; font-size: 1.1875rem; }
 .hero__nav a { text-decoration-color: currentColor; }
 
-/* ---------- intro: frase fija, fotos que pasan ---------- */
+/* ---------- intro ---------- */
 .intro {
-  display: grid; grid-template-columns: 5fr 7fr; gap: var(--gutter);
+  display: grid; grid-template-columns: 1fr; gap: var(--gutter);
   padding: var(--section) var(--margin) 0;
   align-items: start;
 }
-.intro__pin { position: sticky; top: 28svh; display: grid; gap: 1.5rem; }
+.intro__pin { display: grid; gap: 1.5rem; }
 .intro__statement { font-family: var(--font-display); font-weight: 700; font-size: var(--step-lead); line-height: 1.05; max-width: 27ch; }
 .intro__note { max-width: 34ch; }
-.intro__photos { display: grid; grid-template-columns: repeat(7, 1fr); row-gap: 8svh; }
-.intro__fig { position: relative; }
-.intro__fig img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; }
-.intro__fig::after, .gallery__panel::after, .step__media::after { content: ""; position: absolute; inset: 0; background: var(--overlay); pointer-events: none; }
-.intro__fig--a { grid-column: 1 / span 4; }
-.intro__fig--b { grid-column: 3 / span 5; }
-.intro__fig--c { grid-column: 2 / span 3; }
 
 /* ---------- servicios: foto fija, lista activa ---------- */
 .services {
@@ -146,29 +139,9 @@ p { max-width: 62ch; text-wrap: pretty; }
   .row__head:hover { color: var(--ink); }
 }
 
-/* ---------- galería: telón de tres fotos ---------- */
-.gallery { position: relative; }
-.gallery__note { padding: 0 var(--margin) 2rem 58%; max-width: none; }
-/* Las fotos son verticales: en escritorio van de a dos por pantalla. */
-.gallery__panel {
-  position: sticky; top: 0; height: 100svh; overflow: hidden;
-  display: grid; grid-template-columns: 1fr 1fr;
-  background: var(--bg);
-}
-.gallery__panel img { width: 100%; height: 100%; object-fit: cover; }
-.gallery__panel figcaption {
-  position: absolute; z-index: 1; left: var(--margin); bottom: var(--margin);
-  padding: 0.5rem 0.75rem;
-  background: var(--bg); color: var(--ink);
-  font-size: var(--step-small);
-}
-
 /* ---------- cómo reservar: un verbo por pantalla ---------- */
 .step { position: relative; height: 100svh; overflow: clip; }
 .step:nth-child(2) { background: var(--surface); }
-.step__media { position: absolute; top: 0; right: 0; width: 58%; height: 100%; overflow: hidden; }
-.step__media img { width: 100%; height: 100%; object-fit: cover; }
-.step:nth-child(2) .step__media { right: auto; left: 0; }
 .step__pin { position: relative; display: flow-root; height: 100%; padding-bottom: 11rem; }
 .step__verb {
   position: sticky; top: calc(50svh - 0.5em);
@@ -264,21 +237,12 @@ p { max-width: 62ch; text-wrap: pretty; }
 
   .intro { grid-template-columns: 1fr; }
   .intro__pin { position: static; }
-  .intro__photos { grid-template-columns: repeat(10, 1fr); row-gap: 10svh; }
-  .intro__fig--a { grid-column: 1 / span 6; }
-  .intro__fig--b { grid-column: 3 / span 8; }
-  .intro__fig--c { grid-column: 1 / span 5; }
 
   .services__frame { display: none; }
   .services__list { grid-column: 1 / -1; padding-top: 0; }
   .row__inline { display: block; margin-bottom: 1rem; }
   .row__inline img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
 
-  .gallery__note { padding-left: var(--margin); width: 70%; }
-  .gallery__panel { height: 88svh; display: block; }
-  .gallery__panel img + img { display: none; }
-
-  .step__media, .step:nth-child(2) .step__media { width: 100%; }
   .step__verb { font-size: 22vw; }
   .step__text, .step:nth-child(2) .step__text {
     left: var(--margin); right: var(--margin); max-width: none;
@@ -300,18 +264,11 @@ p { max-width: 62ch; text-wrap: pretty; }
 }
 
 /* ---------- movimiento (el contenido queda visible sin JavaScript) ---------- */
-.shutter { overflow: hidden; }
 @media (prefers-reduced-motion: no-preference) {
   .hero__photo img { animation: drift 24s var(--ease-in-out) infinite alternate; }
   .js [data-rise] { opacity: 0; transform: translateY(24px); animation: rise var(--t-reveal) var(--ease-out) forwards; animation-delay: calc(var(--i, 0) * 90ms + 150ms); }
   .js [data-reveal] { opacity: 0; transform: translateY(24px); transition: opacity 700ms var(--ease-out), transform 900ms var(--ease-out); transition-delay: calc(var(--d, 0) * 80ms); }
   .js [data-reveal].is-in { opacity: 1; transform: none; }
-  .js .shutter[data-reveal] { opacity: 1; transform: none; clip-path: inset(0 0 100% 0); transition: clip-path 800ms var(--ease-in-out); }
-  .js .shutter[data-reveal] img { transform: scale(1.12); transition: transform 1200ms var(--ease-soft); }
-  .js .shutter[data-reveal].is-in { clip-path: inset(0); }
-  .js .shutter[data-reveal].is-in img { transform: none; }
-  .gallery__panel img, .step__media img { transform: scale(1.06); transition: transform 1600ms var(--ease-soft); }
-  .gallery__panel.is-in img, .step.is-in .step__media img { transform: none; }
 }
 @keyframes rise { to { opacity: 1; transform: none; } }
 @keyframes drift { from { transform: scale(1); } to { transform: scale(1.07) translate(-1%, -1%); } }

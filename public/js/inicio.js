@@ -4,7 +4,7 @@ const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 // Aparición única cuando un bloque entra en pantalla. Nunca deja contenido oculto.
 // Se comprueba en cada scroll, así un salto rápido (un ancla, la tecla Fin) no deja nada oculto.
 (() => {
-  let pending = [...document.querySelectorAll("[data-reveal], .gallery__panel, .step")];
+  let pending = [...document.querySelectorAll("[data-reveal], .step")];
   let ticking = false;
   const check = () => {
     ticking = false;
