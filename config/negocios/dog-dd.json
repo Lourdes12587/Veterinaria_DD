@@ -1,0 +1,37 @@
+{
+  "slug": "dog-dd",
+  "nombre": "Dog DD",
+  "subtitulo": "Peluquería canina y veterinaria",
+  "zonaHoraria": "Europe/Madrid",
+  "telefono": "+34 697 955 919",
+  "emailNegocio": "demo@creaciones-digitales.com",
+  "etiquetaDemo": true,
+  "pasoMinutos": 15,
+  "antelacionMinimaHoras": 2,
+  "diasVisibles": 30,
+  "cancelacionMinimaHoras": 12,
+  "servicios": [
+    { "id": "consulta", "nombre": "Consulta veterinaria", "minutos": 30, "precio": 40, "margenMin": 10 },
+    { "id": "vacuna", "nombre": "Vacunación", "minutos": 20, "precio": 35, "margenMin": 10 },
+    { "id": "bano-pequeno", "nombre": "Baño perro pequeño", "minutos": 60, "precio": 30, "margenMin": 15 },
+    { "id": "bano-corte-mediano", "nombre": "Baño y corte perro mediano", "minutos": 90, "precio": 45, "margenMin": 15 }
+  ],
+  "profesionales": [
+    {
+      "id": "laura",
+      "nombre": "Laura",
+      "rol": "Veterinaria",
+      "calendarId": "",
+      "servicios": ["consulta", "vacuna"],
+      "horario": { "lun": ["09:30-14:00", "16:00-20:00"], "mar": ["09:30-14:00"], "jue": ["09:30-14:00", "16:00-20:00"] }
+    },
+    {
+      "id": "marc",
+      "nombre": "Marc",
+      "rol": "Peluquero canino",
+      "calendarId": "",
+      "servicios": ["bano-pequeno", "bano-corte-mediano"],
+      "horario": { "mar": ["10:00-18:00"], "mie": ["10:00-18:00"], "sab": ["10:00-14:00"] }
+    }
+  ]
+}

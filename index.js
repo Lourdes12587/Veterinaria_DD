@@ -1,23 +1,28 @@
 const express = require('express');
 const app = express();
-require("dotenv").config({ path: "./env/.env" }); 
-const session = require('express-session');
-//const { swaggerJSDoc, swaggerUi, swaggerSpec } = require("./swagger"); 
+require("dotenv").config({ path: "./env/.env" });
+const { cargarNegocio } = require("./config/negocio");
+const { comprobarConexion } = require("./config/db");
+//const { swaggerJSDoc, swaggerUi, swaggerSpec } = require("./swagger");
 //const http = require ("http");
 //const server = http.createServer(app);
 //const cookieSession = require('cookie-session');
 //const cookieParser = require('cookie-parser');
 
-app.use(
-    session({
-        secret: "secret", 
-        resave: false, 
-        saveUninitialized: false, 
-    })
-);
+// Configuración del negocio: si el JSON tiene errores, la app no arranca.
+let negocio;
+try {
+    negocio = cargarNegocio(process.env.NEGOCIO || "dog-dd");
+} catch (e) {
+    console.error(`No se puede arrancar: ${e.message}`);
+    process.exit(1);
+}
+app.locals.negocio = negocio.publico;
 
-app.listen(4000, () => { 
+app.listen(4000, () => {
     console.log("Servidor corriendo en http://localhost:4000");
+    console.log(`Negocio: ${negocio.publico.nombre} (${negocio.publico.slug})`);
+    comprobarConexion();
 });
 
 //app.use(cookieSession({
