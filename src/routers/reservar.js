@@ -85,7 +85,7 @@ module.exports = function crearRouterReservar(negocio) {
       try {
         const resultado = await reservar({ negocio, datos: { ...datos, profesional: datos.profesional || "cualquiera" } });
         // Después de soltar el candado: si algo de esto falla, la cita sigue siendo válida.
-        despuesDeReservar(resultado).catch((e) => console.error("Error después de reservar:", e.message));
+        despuesDeReservar(negocio, resultado).catch((e) => console.error("Error después de reservar:", e.message));
         const url = `/cita/${resultado.token}/confirmada`;
         if (quiereJson(req)) return res.status(201).json({ ok: true, url });
         return res.redirect(303, url);

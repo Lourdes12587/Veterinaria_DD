@@ -13,6 +13,8 @@ const { DateTime } = require("luxon");
 const db = require("../config/db");
 const { calcularHuecos } = require("./disponibilidad");
 const { candidatos, citasEntre } = require("./citas");
+const { registrarEvento } = require("./eventos");
+const notificaciones = require("./notificaciones");
 
 const ESPERA_CANDADO_S = 5;
 const TOKEN = /^[A-Za-z0-9_-]{43}$/; // 32 bytes en base64url
@@ -48,13 +50,6 @@ async function conCandado(conexion, nombre, fn) {
   }
 }
 
-async function registrarEvento(citaId, tipo, detalle = null, conexion = db) {
-  try {
-    await conexion.query("INSERT INTO eventos (cita_id, tipo, detalle) VALUES (?, ?, ?)", [citaId, tipo, detalle && JSON.stringify(detalle)]);
-  } catch (e) {
-    console.error(`No se pudo guardar el evento "${tipo}" de la cita ${citaId}:`, e.code || e.message);
-  }
-}
 
 /**
  * Reserva un hueco. Lanza ErrorReserva si no se puede.
@@ -148,12 +143,11 @@ async function reservar({ negocio, datos, ahora = new Date(), obtenerBloqueos = 
 }
 
 // Tareas después de soltar el candado. Si fallan, la cita sigue siendo válida
-// y el error queda apuntado en "eventos".
-// Fase 5: email y aviso a n8n. Fase 6: evento en Google Calendar.
-async function despuesDeReservar({ cita, token }) {
+// y el error queda apuntado en "eventos" (lo hace services/notificaciones.js).
+// Fase 6: aquí se añadirá el evento de Google Calendar.
+async function despuesDeReservar(negocio, { cita, token }) {
   await registrarEvento(cita.id, "creada", { profesional: cita.profesional, servicio: cita.servicio });
-  const base = (process.env.URL_PUBLICA || `http://localhost:${process.env.PORT || 4000}`).trim().replace(/\/$/, "");
-  console.log(`Cita #${cita.id} creada (${cita.profesional}, ${cita.inicio.toISOString()}). Enlace del cliente: ${base}/cita/${token}`);
+  await notificaciones.alReservar(negocio, { cita, token });
 }
 
 // Cancelar: solo una cita confirmada. Devuelve true si la ha cancelado ahora.
@@ -162,17 +156,15 @@ async function cancelar({ negocio, citaId }) {
   return u.affectedRows === 1;
 }
 
-// Tareas después de cambiar o cancelar (Fase 5: email y n8n; Fase 6: Google).
-async function despuesDeCambiar({ anterior, cita, token }) {
+async function despuesDeCambiar(negocio, { anterior, cita, token }) {
   await registrarEvento(anterior.id, "cambiada", { nueva: cita.id, inicioAnterior: anterior.inicio, inicioNuevo: cita.inicio });
   await registrarEvento(cita.id, "creada", { cambiadaDesde: anterior.id, profesional: cita.profesional, servicio: cita.servicio });
-  const base = (process.env.URL_PUBLICA || `http://localhost:${process.env.PORT || 4000}`).trim().replace(/\/$/, "");
-  console.log(`Cita #${anterior.id} cambiada por #${cita.id} (${cita.profesional}, ${cita.inicio.toISOString()}). Enlace nuevo del cliente: ${base}/cita/${token}`);
+  await notificaciones.alCambiar(negocio, { anteriorId: anterior.id, nuevaId: cita.id, token });
 }
 
-async function despuesDeCancelar({ cita }) {
+async function despuesDeCancelar(negocio, { cita }) {
   await registrarEvento(cita.id, "cancelada", { inicio: cita.inicio });
-  console.log(`Cita #${cita.id} cancelada por el cliente.`);
+  await notificaciones.alCancelar(negocio, { citaId: cita.id });
 }
 
 async function buscarPorToken(negocio, token) {

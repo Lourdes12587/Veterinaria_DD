@@ -14,6 +14,13 @@ const pool = mysql.createPool({
   connectionLimit: 10,
 });
 
+// timezone: 'Z' solo afecta a cómo mysql2 convierte las fechas de JavaScript.
+// NOW() y DEFAULT CURRENT_TIMESTAMP los calcula MySQL con la zona de su sesión
+// (por defecto, la del sistema). Cada conexión nueva fija la sesión en UTC.
+pool.on("connection", (conexion) => {
+  conexion.query("SET time_zone = '+00:00'");
+});
+
 // Comprueba la conexión sin detener la app: la web pública no depende de MySQL
 // para mostrarse, solo la agenda.
 async function comprobarConexion() {

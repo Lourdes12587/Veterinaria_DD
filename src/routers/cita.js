@@ -7,7 +7,7 @@ const { DateTime } = require("luxon");
 const { body, validationResult } = require("express-validator");
 const { reservar, cancelar, buscarPorToken, despuesDeCambiar, despuesDeCancelar, ErrorReserva } = require("../../services/reservas");
 const { crearModeloReserva } = require("../../services/vista-agenda");
-const { crearIcs } = require("../../services/ics");
+const { icsDeCita } = require("../../services/ics");
 const fmt = require("../../services/formato");
 
 const quiereJson = (req) => (req.get("Accept") || "").includes("application/json");
@@ -100,7 +100,7 @@ module.exports = function crearRouterCita(negocio) {
     if (!aTiempo(cita)) return pintarCita(res, cita, { estado: 403 });
     try {
       if (await cancelar({ negocio, citaId: cita.id })) {
-        despuesDeCancelar({ cita }).catch((e) => console.error("Error después de cancelar:", e.message));
+        despuesDeCancelar(negocio, { cita }).catch((e) => console.error("Error después de cancelar:", e.message));
       }
     } catch (e) {
       console.error("Error al cancelar:", e.code || e.message);
@@ -154,7 +154,7 @@ module.exports = function crearRouterCita(negocio) {
           reemplazaCitaId: cita.id,
           privacidadAceptadaAt: cita.privacidad_aceptada_at,
         });
-        despuesDeCambiar({ anterior: cita, ...resultado }).catch((e) => console.error("Error después de cambiar:", e.message));
+        despuesDeCambiar(negocio, { anterior: cita, ...resultado }).catch((e) => console.error("Error después de cambiar:", e.message));
         const url = `/cita/${resultado.token}/confirmada`;
         if (quiereJson(req)) return res.status(201).json({ ok: true, url });
         return res.redirect(303, url);
@@ -193,15 +193,7 @@ module.exports = function crearRouterCita(negocio) {
   router.get("/cita/:token/cita.ics", async (req, res) => {
     const cita = await confirmadaOFuera(req, res);
     if (!cita) return;
-    const d = detalle(cita);
-    const ics = crearIcs({
-      uid: `cita-${cita.id}@${negocio.slug}`,
-      inicio: cita.inicio,
-      fin: cita.fin,
-      titulo: `${d.servicio} · ${negocio.nombre}`,
-      descripcion: `Con ${d.profesional}. Teléfono de ${negocio.nombre}: ${negocio.telefono}`,
-      organizador: negocio.nombre,
-    });
+    const ics = icsDeCita(negocio, cita);
     res.set({ "Content-Type": "text/calendar; charset=utf-8", "Content-Disposition": `attachment; filename="cita-${negocio.slug}.ics"` });
     res.send(ics);
   });

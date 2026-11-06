@@ -3,6 +3,8 @@ const app = express();
 require("dotenv").config({ path: "./env/.env" });
 const { cargarNegocio } = require("./config/negocio");
 const { comprobarConexion } = require("./config/db");
+const { iniciarRecordatorios } = require("./services/recordatorios");
+const { modoConsola } = require("./services/email");
 //const { swaggerJSDoc, swaggerUi, swaggerSpec } = require("./swagger");
 //const http = require ("http");
 //const server = http.createServer(app);
@@ -22,7 +24,9 @@ app.locals.negocio = negocio.publico;
 app.listen(4000, () => {
     console.log("Servidor corriendo en http://localhost:4000");
     console.log(`Negocio: ${negocio.publico.nombre} (${negocio.publico.slug})`);
+    console.log(`Emails: ${modoConsola() ? "en la consola (no hay RESEND_API_KEY)" : "con Resend"} · Avisos n8n: ${(process.env.N8N_WEBHOOK_URL || "").trim() ? "activados" : "desactivados"}`);
     comprobarConexion();
+    iniciarRecordatorios(negocio.completo);
 });
 
 //app.use(cookieSession({

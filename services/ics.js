@@ -47,4 +47,18 @@ function crearIcs({ uid, inicio, fin, titulo, descripcion = "", organizador = ""
   return lineas.map(plegar).join("\r\n") + "\r\n";
 }
 
-module.exports = { crearIcs };
+// .ics de una fila de la tabla citas (para la descarga y el adjunto del email).
+function icsDeCita(negocio, cita) {
+  const s = negocio.servicios.find((x) => x.id === cita.servicio);
+  const p = negocio.profesionales.find((x) => x.id === cita.profesional);
+  return crearIcs({
+    uid: `cita-${cita.id}@${negocio.slug}`,
+    inicio: cita.inicio,
+    fin: cita.fin,
+    titulo: `${s ? s.nombre : "Cita"} · ${negocio.nombre}`,
+    descripcion: `Con ${p ? p.nombre : cita.profesional}. Teléfono de ${negocio.nombre}: ${negocio.telefono}`,
+    organizador: negocio.nombre,
+  });
+}
+
+module.exports = { crearIcs, icsDeCita };
