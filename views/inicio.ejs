@@ -9,7 +9,7 @@
       nombre: "Hotel",
       frase: "hotel",
       detalle: "Noches y fines de semana",
-      texto: "Estadías cuando necesitás viajar. Duermen adentro de la casa, en camas y mantas, nunca en un canil.",
+      texto: "Estancias cuando necesitas viajar. Duermen dentro de la casa, en camas y mantas, nunca en una jaula.",
       foto: "adistramiento.jpg",
       alt: "Bulldog francés negro mirando hacia arriba",
     },
@@ -18,14 +18,14 @@
       nombre: "Guardería",
       frase: "guardería",
       detalle: "Por día",
-      texto: "Jornadas de juego en el patio, pileta en verano, siesta a la sombra y alguien mirando todo el tiempo.",
+      texto: "Jornadas de juego en el patio, piscina en verano, siesta a la sombra y alguien mirando todo el tiempo.",
       foto: "guarderia.jpg",
       alt: "Perro tricolor recostado sobre un fondo amarillo",
     },
     {
       id: "peluqueria",
       nombre: "Peluquería y spa",
-      frase: "un turno de peluquería y spa",
+      frase: "una cita de peluquería y spa",
       detalle: "Baño, corte e higiene",
       texto: "Baño, corte, higiene y tratamientos pensados para cada raza, tamaño y tipo de pelo.",
       foto: "peluqueria.jpg",
@@ -34,7 +34,7 @@
     {
       id: "veterinaria",
       nombre: "Veterinaria",
-      frase: "un turno de veterinaria",
+      frase: "una cita de veterinaria",
       detalle: "Consultas y controles",
       texto: "Consultas, orientación preventiva y seguimiento del bienestar diario de tu perro.",
       foto: "veterinaria-sin-texto.jpg",
@@ -44,7 +44,7 @@
     {
       id: "colegio",
       nombre: "Colegio",
-      frase: "un lugar en el colegio",
+      frase: "una plaza en el colegio",
       detalle: "Cachorros y adultos",
       texto: "Socialización, aprendizaje y acompañamiento para perros jóvenes y adultos.",
       foto: "colegiales.jpg",
@@ -97,7 +97,7 @@
                 Sin jaulas, en una casa con patio
               </p>
               <p class="hero__line" data-rise style="--i: 2">
-                Todo lo que tu perro sueña, mientras vos no estás.
+                Todo lo que tu perro sueña, mientras tú no estás.
               </p>
             </div>
 
@@ -120,10 +120,10 @@
       <section class="intro" aria-label="Sin jaulas">
         <div class="intro__pin">
           <p class="intro__statement" data-reveal>
-            Acá no hay caniles. Duermen en camas, mantas y almohadones, como en casa.
+            Aquí no hay jaulas. Duermen en camas, mantas y almohadones, como en casa.
           </p>
           <p class="intro__note muted" data-reveal style="--d: 1">
-            Cada huésped tiene su lugar adentro de la casa y su rutina de siempre: horarios de comida,
+            Cada huésped tiene su sitio dentro de la casa y su rutina de siempre: horarios de comida,
             paseos y siesta.
           </p>
         </div>
@@ -170,15 +170,15 @@
         <h2 class="sr-only" id="pasos-titulo">Cómo reservar</h2>
         <ol class="steps__list">
           <li class="step">
-            <div class="step__pin"><h3 class="step__verb">Escribí</h3></div>
-            <p class="step__text">Contanos por WhatsApp qué servicio buscás, las fechas y cómo es tu perro.</p>
+            <div class="step__pin"><h3 class="step__verb">Escribe</h3></div>
+            <p class="step__text">Cuéntanos por WhatsApp qué servicio buscas, las fechas y cómo es tu perro.</p>
           </li>
           <li class="step">
-            <div class="step__pin"><h3 class="step__verb">Traelo</h3></div>
+            <div class="step__pin"><h3 class="step__verb">Tráelo</h3></div>
             <p class="step__text">Lo recibimos en casa, con su manta o su juguete si los tiene.</p>
           </li>
           <li class="step">
-            <div class="step__pin"><h3 class="step__verb">Buscalo</h3></div>
+            <div class="step__pin"><h3 class="step__verb">Búscalo</h3></div>
             <p class="step__text">Vuelve a casa limpio, cansado de jugar y bien dormido.</p>
           </li>
         </ol>
@@ -189,7 +189,7 @@
         <div class="compose__controls">
           <h2 class="head" id="reservar-titulo" data-reveal>Tu mensaje, ya escrito</h2>
           <p class="compose__intro" data-reveal style="--d: 1">
-            Elegí el servicio y el tamaño, poné el nombre y las fechas. Lo mandás por WhatsApp con un toque.
+            Elige el servicio y el tamaño, pon el nombre y las fechas. Lo envías por WhatsApp con un toque.
           </p>
 
           <form class="compose__form" data-compose data-reveal style="--d: 2" action="<%= whatsapp %>" method="get" target="_blank">
@@ -236,7 +236,7 @@
 
         <div class="compose__preview" data-reveal style="--d: 1">
           <p class="compose__message" data-message aria-live="polite">
-            Hola Dog DD, quiero reservar hotel para mi perro, de tamaño mediano. ¿Tienen lugar?
+            Hola Dog DD, quiero reservar hotel para mi perro, de tamaño mediano. ¿Tenéis sitio?
           </p>
           <a class="button" data-send href="<%= whatsapp %>" target="_blank" rel="noopener">Enviar por WhatsApp</a>
         </div>
@@ -245,7 +245,7 @@
       <!-- Contacto: el correo como tipografía -->
       <section class="contact" id="contacto" aria-label="Contacto">
         <p class="contact__lead" data-reveal>
-          Escribinos para reservar, preguntar un precio o venir a conocer la casa.
+          Escríbenos para reservar, preguntar un precio o venir a conocer la casa.
         </p>
         <p class="contact__mail" data-reveal style="--d: 1">
           <a href="mailto:<%= email %>?subject=Consulta%20para%20Dog%20DD">DogDD@<wbr /><span>gmail.com</span></a>

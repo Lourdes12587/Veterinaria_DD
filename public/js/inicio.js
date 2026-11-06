@@ -104,7 +104,7 @@ const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let cuando = "";
     if (desde && hasta) cuando = `, del ${desde} al ${hasta}`;
     else if (desde) cuando = `, para el ${desde}`;
-    const text = `Hola Dog DD, quiero reservar ${servicio} para ${quien}, de tamaño ${tamano}${cuando}. ¿Tienen lugar?`;
+    const text = `Hola Dog DD, quiero reservar ${servicio} para ${quien}, de tamaño ${tamano}${cuando}. ¿Tenéis sitio?`;
     out.textContent = text;
     send.href = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
   };
