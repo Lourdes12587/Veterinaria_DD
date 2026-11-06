@@ -127,4 +127,18 @@ function calcularHuecos({ negocio, servicioId, profesionalId = "cualquiera", fec
     }));
 }
 
-module.exports = { calcularHuecos };
+// Fechas visibles (hoy + diasVisibles - 1) en la zona del negocio, como "YYYY-MM-DD".
+function fechasVisibles(negocio, ahora) {
+  const hoy = DateTime.fromJSDate(ahora, { zone: negocio.zonaHoraria }).startOf("day");
+  return Array.from({ length: negocio.diasVisibles }, (_, i) => hoy.plus({ days: i }).toISODate());
+}
+
+// Para el selector de días: cada fecha visible y si tiene algún hueco.
+function calcularDias({ negocio, servicioId, profesionalId = "cualquiera", citas = [], bloqueos = [], ahora }) {
+  return fechasVisibles(negocio, ahora).map((fecha) => ({
+    fecha,
+    disponible: calcularHuecos({ negocio, servicioId, profesionalId, fecha, citas, bloqueos, ahora }).length > 0,
+  }));
+}
+
+module.exports = { calcularHuecos, calcularDias, fechasVisibles };

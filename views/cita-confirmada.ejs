@@ -1,0 +1,24 @@
+<%- include("partials/cabeza-agenda", { titulo: "Cita confirmada" }) %>
+    <main>
+      <section class="compose" aria-labelledby="titulo">
+        <div class="compose__controls">
+          <p class="small muted"><a class="link" href="/"><%= negocio.nombre %></a></p>
+          <h1 class="head" id="titulo">Cita confirmada</h1>
+          <p class="compose__intro">Gracias, <%= cita.cliente %>. Te esperamos.</p>
+          <p class="compose__message">
+            <%= cita.servicio %> con <%= cita.profesional %>,<br />
+            el <%= cita.fecha %> a las <%= cita.hora %>.
+          </p>
+          <p class="muted">
+            <% if (cita.minutos) { %><%= cita.minutos %> min · <% } %><%= cita.precio %>. Si no puedes venir, llámanos al
+            <a class="link" href="tel:<%= negocio.telefono.replace(/\s/g, '') %>"><%= negocio.telefono %></a>.
+          </p>
+        </div>
+        <div class="compose__preview">
+          <a class="button" href="/cita/<%= token %>/cita.ics" download>Añadir a mi calendario</a>
+          <a class="link" href="/">Volver al inicio</a>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

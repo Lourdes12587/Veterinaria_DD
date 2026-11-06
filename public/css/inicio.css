@@ -189,6 +189,17 @@ p { max-width: 62ch; text-wrap: pretty; }
 
 .compose__preview { grid-column: 8 / span 5; position: sticky; top: 20vh; display: grid; gap: 2rem; justify-items: start; padding-top: 1rem; }
 .compose__message { font-family: var(--font-display); font-weight: 700; font-size: var(--step-lead); line-height: 1.1; max-width: 30ch; }
+/* Estados de la agenda que el formulario anterior no tenía. Mismos colores y medidas. */
+.choice input:disabled { cursor: not-allowed; }
+.choice input:disabled + span { opacity: 0.35; }
+.compose__aviso { max-width: 40ch; padding: 0.75rem 1rem; background: var(--accent); color: var(--accent-ink); font-weight: 500; }
+.compose__check { display: flex; align-items: flex-start; gap: 0.75rem; font-size: var(--step-small); color: var(--muted); }
+.compose__check input { flex: none; width: 1.25rem; height: 1.25rem; margin: 0.1rem 0 0; accent-color: var(--accent); }
+.compose__check a, .field-label a { color: var(--ink); }
+textarea.field { resize: vertical; font-family: inherit; line-height: 1.4; }
+.compose [aria-busy="true"] { opacity: 0.55; transition: opacity var(--t-ui) ease; }
+.compose .button:disabled { opacity: 0.5; cursor: not-allowed; }
+.js [data-sinjs] { display: none; }
 
 /* ---------- contacto: el correo como tipografía ---------- */
 .contact {

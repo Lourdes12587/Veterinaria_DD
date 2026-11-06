@@ -1,0 +1,16 @@
+<%- include("partials/cabeza-agenda", { titulo: "Enlace no válido" }) %>
+    <main>
+      <section class="compose" aria-labelledby="titulo">
+        <div class="compose__controls">
+          <p class="small muted"><a class="link" href="/"><%= negocio.nombre %></a></p>
+          <h1 class="head" id="titulo"><%= mensaje %></h1>
+          <p class="compose__intro">
+            Si necesitas algo de tu cita, llámanos al
+            <a class="link" href="tel:<%= negocio.telefono.replace(/\s/g, '') %>"><%= negocio.telefono %></a>.
+          </p>
+          <p><a class="button" href="/#reservar">Pedir otra cita</a></p>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

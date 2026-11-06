@@ -53,6 +53,7 @@ app.use(express.json());
 //app.use('/uploads', express.static('public/uploads'));
 
 //rutas
+app.use("/", require("./src/routers/reservar")(negocio.completo));
 app.use("/", require("./src/routers/inicio"));
 app.use("/", require("./src/routers/peluqueria"));
 app.use("/", require("./src/routers/servicios"));

@@ -81,39 +81,160 @@ const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   });
 })();
 
-// Reserva en vivo: arma el mensaje de WhatsApp con lo que elige el visitante.
+// Agenda: sin recargar la página, pide días y horas libres a /api y envía la reserva.
+// Si este código falla, los formularios siguen funcionando como GET y POST normales.
 (() => {
-  const form = document.querySelector("[data-compose]");
-  const out = document.querySelector("[data-message]");
-  const send = document.querySelector("[data-send]");
-  if (!form || !out || !send) return;
-  const phone = "";
-  const fecha = (v) => {
-    if (!v) return "";
-    const [, m, d] = v.split("-");
-    return `${d}/${m}`;
+  const root = document.querySelector("[data-agenda]");
+  const datosEl = document.getElementById("agenda-datos");
+  if (!root || !datosEl || !window.fetch) return;
+  const datos = JSON.parse(datosEl.textContent);
+  const seleccion = root.querySelector("[data-seleccion]");
+  const reserva = root.querySelector("[data-reserva]");
+  const cajaPros = root.querySelector("[data-profesionales]");
+  const cajaDias = root.querySelector("[data-dias]");
+  const cajaHoras = root.querySelector("[data-horas]");
+  const sinDias = root.querySelector("[data-sin-dias]");
+  const sinHoras = root.querySelector("[data-sin-horas]");
+  const aviso = root.querySelector("[data-aviso]");
+  const resumen = root.querySelector("[data-resumen]");
+  const confirmar = root.querySelector("[data-confirmar]");
+
+  const valor = (form, name) => (form.querySelector(`input[name="${name}"]:checked`) || {}).value || "";
+  const estado = () => ({ servicio: valor(seleccion, "servicio"), profesional: valor(seleccion, "profesional") || "cualquiera", fecha: valor(seleccion, "fecha"), inicio: valor(reserva, "inicio") });
+
+  const mostrarAviso = (texto) => {
+    aviso.textContent = texto || "";
+    aviso.hidden = !texto;
   };
-  const build = () => {
-    const data = new FormData(form);
-    const servicio = data.get("servicio") || "hotel";
-    const tamano = data.get("tamano") || "mediano";
-    const nombre = (data.get("nombre") || "").trim();
-    const desde = fecha(data.get("desde"));
-    const hasta = fecha(data.get("hasta"));
-    const quien = nombre ? nombre : "mi perro";
-    let cuando = "";
-    if (desde && hasta) cuando = `, del ${desde} al ${hasta}`;
-    else if (desde) cuando = `, para el ${desde}`;
-    const text = `Hola Dog DD, quiero reservar ${servicio} para ${quien}, de tamaño ${tamano}${cuando}. ¿Tenéis sitio?`;
-    out.textContent = text;
-    send.href = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
-  };
-  form.addEventListener("input", build);
-  form.addEventListener("change", build);
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
-    build();
-    window.open(send.href, "_blank", "noopener");
+
+  async function api(ruta, params) {
+    const r = await fetch(`/api/${encodeURIComponent(datos.slug)}/${ruta}?${new URLSearchParams(params)}`, { headers: { Accept: "application/json" } });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(j.error || "No se pudo cargar la agenda. Inténtalo de nuevo.");
+    return j;
+  }
+
+  // Botones con el mismo marcado que pinta el servidor.
+  function opcion(name, value, texto, { checked = false, disabled = false, required = false } = {}) {
+    const label = document.createElement("label");
+    label.className = "choice";
+    const input = document.createElement("input");
+    Object.assign(input, { type: "radio", name, value, checked, disabled, required });
+    const span = document.createElement("span");
+    span.textContent = texto;
+    label.append(input, span);
+    return label;
+  }
+
+  const fechaLarga = new Intl.DateTimeFormat("es-ES", { weekday: "long", day: "numeric", month: "long", timeZone: datos.zona });
+  const horaCorta = new Intl.DateTimeFormat("es-ES", { hour: "2-digit", minute: "2-digit", timeZone: datos.zona });
+  const euros = (n) => `${n.toLocaleString("es-ES")} €`;
+
+  function pintarResumen() {
+    const e = estado();
+    const s = datos.servicios.find((x) => x.id === e.servicio);
+    if (!s) return;
+    const base = `${s.minutos} min · ${euros(s.precio)}`;
+    if (!e.inicio) {
+      resumen.textContent = `${s.nombre} · ${base}. Elige día y hora.`;
+      return;
+    }
+    const d = new Date(e.inicio);
+    const p = datos.profesionales.find((x) => x.id === e.profesional);
+    resumen.textContent = `${s.nombre}${p ? ` con ${p.nombre}` : ""}, el ${fechaLarga.format(d).replace(",", "")} a las ${horaCorta.format(d)}. ${base}.`;
+  }
+
+  function sincronizarOcultos() {
+    const e = estado();
+    reserva.querySelector('input[name="servicio"]').value = e.servicio;
+    reserva.querySelector('input[name="profesional"]').value = e.profesional;
+  }
+
+  function pintarProfesionales() {
+    const e = estado();
+    const pros = datos.profesionales.filter((p) => p.servicios.includes(e.servicio));
+    const actual = pros.some((p) => p.id === e.profesional) ? e.profesional : "cualquiera";
+    cajaPros.replaceChildren(
+      opcion("profesional", "cualquiera", "Cualquiera", { checked: actual === "cualquiera" }),
+      ...pros.map((p) => opcion("profesional", p.id, p.nombre, { checked: actual === p.id })),
+    );
+  }
+
+  let peticion = 0; // descarta respuestas viejas si el cliente cambia rápido de opción
+
+  async function cargarHoras() {
+    const id = ++peticion;
+    const e = estado();
+    cajaHoras.setAttribute("aria-busy", "true");
+    try {
+      const huecos = e.fecha ? (await api("huecos", { servicio: e.servicio, profesional: e.profesional, fecha: e.fecha })).huecos : [];
+      if (id !== peticion) return;
+      cajaHoras.replaceChildren(...huecos.map((h) => opcion("inicio", h.inicio, h.hora, { checked: h.inicio === e.inicio, required: true })));
+      sinHoras.hidden = !(e.fecha && huecos.length === 0);
+    } finally {
+      if (id === peticion) cajaHoras.removeAttribute("aria-busy");
+    }
+    pintarResumen();
+  }
+
+  async function cargarDias() {
+    const id = ++peticion;
+    const e = estado();
+    cajaDias.setAttribute("aria-busy", "true");
+    try {
+      const { dias } = await api("dias", { servicio: e.servicio, profesional: e.profesional });
+      if (id !== peticion) return;
+      const libres = dias.filter((d) => d.disponible).map((d) => d.fecha);
+      const fecha = libres.includes(e.fecha) ? e.fecha : libres[0] || "";
+      cajaDias.replaceChildren(...dias.map((d) => opcion("fecha", d.fecha, d.etiqueta, { checked: d.fecha === fecha, disabled: !d.disponible })));
+      sinDias.hidden = libres.length > 0;
+    } finally {
+      if (id === peticion) cajaDias.removeAttribute("aria-busy");
+    }
+    await cargarHoras();
+  }
+
+  const conAviso = (fn) => fn().then(() => mostrarAviso(""), (err) => mostrarAviso(err.message));
+
+  seleccion.addEventListener("change", (ev) => {
+    const name = ev.target.name;
+    if (name === "servicio") pintarProfesionales();
+    sincronizarOcultos();
+    pintarResumen();
+    conAviso(name === "fecha" ? cargarHoras : cargarDias);
   });
-  build();
+  seleccion.addEventListener("submit", (ev) => ev.preventDefault());
+  reserva.addEventListener("change", (ev) => {
+    if (ev.target.name === "inicio") pintarResumen();
+  });
+
+  reserva.addEventListener("submit", async (ev) => {
+    ev.preventDefault();
+    if (!reserva.reportValidity()) return;
+    confirmar.disabled = true;
+    mostrarAviso("");
+    try {
+      const r = await fetch(reserva.action.split("#")[0], {
+        method: "POST",
+        headers: { Accept: "application/json", "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams(new FormData(reserva)),
+      });
+      const j = await r.json().catch(() => ({}));
+      if (r.ok && j.url) {
+        window.location.assign(j.url);
+        return;
+      }
+      mostrarAviso(j.error || "No hemos podido guardar la cita. Inténtalo de nuevo.");
+      // La hora se ocupó mientras rellenaba: se recargan días y horas, sus datos no se tocan.
+      if (j.codigo === "ocupado") await cargarDias().catch(() => {});
+      aviso.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "center" });
+    } catch {
+      mostrarAviso("No hay conexión. Revisa tu internet e inténtalo de nuevo.");
+    } finally {
+      confirmar.disabled = false;
+    }
+  });
+
+  sincronizarOcultos();
+  pintarResumen();
 })();
