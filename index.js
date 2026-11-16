@@ -10,7 +10,7 @@ const session = require('express-session');
 
 app.use(
     session({
-        secret: "secret", 
+        secret: process.env.SESSION_SECRET || "cambia-esta-clave", 
         resave: false, 
         saveUninitialized: false, 
     })
